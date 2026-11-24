@@ -20,18 +20,30 @@
 
   <!-- Leaflet 1.9.4 -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=18" />
 </head>
 <body>
   <!-- ====================================================================
-       PAGE D'ACCUEIL — Mosaïque aléatoire de portraits d'écrivains & Langues
+       PAGE D'ACCUEIL — Acte 1 (Portraits + Titre + Peer Gynt) -> Acte 2 (Menu translucide)
        ==================================================================== -->
-  <section id="welcome-screen" class="welcome-screen" aria-label="Accueil">
+  <section id="welcome-screen" class="welcome-screen is-splash" aria-label="Accueil">
     <!-- Mur de portraits généré aléatoirement à chaque ouverture -->
     <div id="welcome-portraits-wall" class="welcome-portraits-wall" aria-hidden="true"></div>
     <div class="welcome-scrim" aria-hidden="true"></div>
 
-    <div class="welcome-card">
+    <!-- ACTE 1 : Ouverture cinématographique (portraits + titre pur + discret JLDApps 2026) -->
+    <div id="welcome-splash" class="welcome-splash" role="button" tabindex="0" aria-label="Passer au menu">
+      <div class="splash-center">
+        <div class="splash-ornament">SANARY-SUR-MER • 1933–1940</div>
+        <h1 class="splash-title">Sur les pas des exilés</h1>
+        <div class="splash-rule" aria-hidden="true"></div>
+        <div class="splash-music-hint">♪ Peer Gynt — Edvard Grieg</div>
+      </div>
+      <div class="splash-signature">JLDApps 2026</div>
+    </div>
+
+    <!-- ACTE 2 : Menu linguistique & choix de boucle en verre translucide -->
+    <div id="welcome-card" class="welcome-card welcome-card-glass hidden">
       <div class="welcome-emblem-row">
         <img src="images/icon.svg" alt="" class="welcome-logo" />
         <span id="welcome-tag" class="welcome-tag">Parcours de mémoire • Audioguide GPS</span>
@@ -39,28 +51,11 @@
 
       <h1 id="welcome-title" class="welcome-title">Sur les pas des exilés</h1>
       <p id="welcome-subtitle" class="welcome-subtitle">Sanary-sur-Mer • 1933–1940</p>
-      <p id="welcome-intro" class="welcome-intro">
-        Marchez sur les traces des 68 écrivains, peintres et penseurs européens réfugiés à Sanary-sur-Mer entre 1933 et 1940.
-      </p>
 
-      <!-- Sélecteur de langue haut de gamme (Capsule éditoriale + menu vitré nuit méditerranéenne) -->
+      <!-- Menu linguistique translucide (8 langues directement sélectionnables) -->
       <div class="welcome-section">
         <div id="welcome-choose-lang" class="welcome-section-label">Choisissez votre langue (interface &amp; audio)</div>
-        <div class="modern-lang-wrap">
-          <button id="btn-welcome-lang-trigger" class="modern-lang-trigger" aria-haspopup="listbox" aria-expanded="false">
-            <span class="modern-lang-left">
-              <span id="welcome-lang-current-flag" class="lang-circle-flag"></span>
-              <span class="modern-lang-meta">
-                <span id="welcome-lang-current-name" class="modern-lang-name">Français</span>
-                <span id="welcome-lang-current-sub" class="modern-lang-sub">Interface &amp; Audio MP3</span>
-              </span>
-            </span>
-            <span class="modern-lang-right">
-              <span id="welcome-lang-current-code" class="modern-lang-code">FR</span>
-              <svg class="modern-lang-chevron" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </span>
-          </button>
-        </div>
+        <div id="welcome-lang-grid" class="lang-menu-list" role="listbox" aria-label="Langue"></div>
       </div>
 
       <!-- Choix de la boucle -->
@@ -84,7 +79,11 @@
         </svg>
         <span id="welcome-start-label">Commencer le parcours</span>
       </button>
+
+      <div class="welcome-card-signature">JLDApps 2026</div>
     </div>
+
+    <audio id="intro-audio" src="audio/intro-peer-gynt.mp3" preload="auto"></audio>
   </section>
 
   <!-- ====================================================================
@@ -371,6 +370,6 @@
   <script src="data/etapes.js?v=11"></script>
   <script src="data/i18n.js?v=8"></script>
   <script src="data/i18n_steps.js?v=5"></script>
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=18"></script>
 </body>
 </html>
