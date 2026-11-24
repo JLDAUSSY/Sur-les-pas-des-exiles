@@ -709,15 +709,39 @@
     map.fitBounds(bounds, { padding: [45, 45], maxZoom: 16 });
   }
 
-  // ---------- Moteur GPS Continu (technologie RandoTracker) ----------
-  function startGpsWatch() {
+  // ---------- Moteur GPS Continu résilient (technologie RandoTracker) ----------
+  function startGpsWatch(highAccuracy = true) {
     if (!('geolocation' in navigator)) {
       setGpsStatus('gps-err', t('gpsUnavailable'));
       return;
     }
 
+    if (state.gpsWatchId !== null) {
+      try {
+        navigator.geolocation.clearWatch(state.gpsWatchId);
+      } catch (_) {}
+      state.gpsWatchId = null;
+    }
+
     setGpsStatus('', t('gpsSearching'));
 
+    // 1. Premier accrochage rapide (Wi-Fi / réseau / dernier fix connu — fonctionne aussi en intérieur)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (state.simMode) return;
+        onNewPosition(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          pos.coords.accuracy || 25,
+          pos.coords.heading
+        );
+        setGpsStatus('gps-ok', `${t('gpsActive')} (±${Math.round(pos.coords.accuracy || 15)} m)`);
+      },
+      () => {},
+      { enableHighAccuracy: false, maximumAge: 60000, timeout: 8000 }
+    );
+
+    // 2. Suivi continu haute précision avec repli automatique si signal satellite faible en intérieur
     state.gpsWatchId = navigator.geolocation.watchPosition(
       (pos) => {
         if (state.simMode) return;
@@ -731,13 +755,21 @@
       },
       (err) => {
         if (state.simMode) return;
-        const msg = err.code === 1 ? t('gpsAllow') : t('gpsWeak');
-        setGpsStatus('gps-err', msg);
+        if (err.code === 1) {
+          setGpsStatus('gps-err', t('gpsAllow'));
+          return;
+        }
+        // Si le mode satellite pur expire (en intérieur), bascule automatiquement sur localisation réseau/hybride
+        if (highAccuracy) {
+          startGpsWatch(false);
+        } else if (!state.userPos) {
+          setGpsStatus('gps-err', t('gpsWeak'));
+        }
       },
       {
-        enableHighAccuracy: true,
-        maximumAge: 3000,
-        timeout: 15000
+        enableHighAccuracy: highAccuracy,
+        maximumAge: highAccuracy ? 5000 : 15000,
+        timeout: 30000
       }
     );
   }
@@ -1386,6 +1418,7 @@
       if (state.userPos) {
         map.setView([state.userPos.lat, state.userPos.lon], Math.max(map.getZoom(), 16), { animate: true });
       } else {
+        startGpsWatch(true);
         const cur = getStepById(state.currentStepId);
         map.setView([cur.lat, cur.lon], 16, { animate: true });
       }
