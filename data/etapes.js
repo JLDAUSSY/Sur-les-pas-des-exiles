@@ -88,8 +88,8 @@ window.PARCOURS_ETAPES = [
     "lat": 43.117626,
     "lon": 5.804411,
     "audio": "audio/etape-05.mp3",
-    "image": "images/etape-05.jpg",
-    "imageCredit": "Stefan Zweig (à gauche), invité régulier de la Villa L'Enclos — Archive, Domaine public",
+    "image": "images/etape-05.jpg?v=27",
+    "imageCredit": "Stefan Zweig, invité régulier de la Villa L'Enclos — Archive, Domaine public",
     "personnalites": [
       "Hilde Stieler",
       "Erich Klossowski",
