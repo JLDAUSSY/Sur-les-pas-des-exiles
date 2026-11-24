@@ -1532,27 +1532,67 @@ html, body {
 
 .end-signature-box {
   width: 100%;
-  background: linear-gradient(135deg, var(--med-blue) 0%, var(--med-blue-dark) 100%);
-  color: #faf7f2;
-  border-radius: 16px;
-  padding: 16px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
   margin: 2px 0;
-  box-shadow: 0 6px 18px rgba(17, 53, 79, 0.25);
+  border-radius: 12px;
+  background: rgba(26, 77, 114, 0.06);
+  border: 1px solid rgba(26, 77, 114, 0.12);
+}
+
+.end-signature-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+  text-align: left;
+  min-width: 0;
 }
 
 .end-signature-brand {
-  font-family: var(--font-serif);
-  font-size: 1.65rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #f6e3ba;
+  letter-spacing: 0.08em;
+  color: var(--med-blue);
+  opacity: 0.82;
+}
+
+.end-signature-sep {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  opacity: 0.55;
 }
 
 .end-signature-sub {
-  font-size: 0.78rem;
-  color: #d6e6f2;
-  margin-top: 3px;
-  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+}
+
+.end-mail-link {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 77, 114, 0.1);
+  color: var(--med-blue);
+  border: 1px solid rgba(26, 77, 114, 0.2);
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.end-mail-link:hover,
+.end-mail-link:focus-visible {
+  background: var(--med-blue);
+  color: #ffffff;
+  transform: scale(1.06);
 }
 
 .end-actions {
