@@ -13,7 +13,7 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v26';
+  const AUDIO_VER = 'v27';
   const RETURN_STEP_ID = 99;
 
   const FLAG_SVGS = {
@@ -38,7 +38,7 @@
   const WRITER_PORTRAITS = [
     { src: 'images/etape-08.jpg', name: 'Thomas Mann' },
     { src: 'images/etape-13.jpg', name: 'Aldous Huxley' },
-    { src: 'images/etape-05.jpg', name: 'Stefan Zweig' },
+    { src: 'images/etape-05.jpg?v=27', name: 'Stefan Zweig' },
     { src: 'images/etape-11.jpg', name: 'Lion Feuchtwanger' },
     { src: 'images/etape-03.jpg', name: 'Heinrich Mann' },
     { src: 'images/etape-02.jpg', name: 'Friedrich Wolf' },
