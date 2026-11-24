@@ -13,7 +13,7 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v28';
+  const AUDIO_VER = 'v29';
   const RETURN_STEP_ID = 99;
 
   const FLAG_SVGS = {
@@ -1308,16 +1308,24 @@
 
   function openWelcomeScreen() {
     el.audio.pause();
+    el.audio.currentTime = 0;
     stopIntroMusic();
     stopOutroMusic();
     stopSpiralCredits();
     el.endScreen.classList.add('hidden');
     el.listModal.classList.add('hidden');
     el.photoLightbox.classList.add('hidden');
-    renderWelcomePortraits(); // Nouvelle disposition aléatoire à chaque ouverture !
-    if (el.welcomeSplash) el.welcomeSplash.classList.add('hidden');
-    if (el.welcomeCard) el.welcomeCard.classList.remove('hidden');
-    el.welcomeScreen.classList.remove('hidden', 'is-splash');
+    if (el.langMenuOverlay) el.langMenuOverlay.classList.add('hidden');
+
+    // Réinitialise toujours le parcours au tout début (Étape 1)
+    state.currentStepId = 1;
+    selectStep(1, { openSheet: true, panToStep: false });
+    saveState();
+
+    // Repart toujours du tout début de l'application (Acte 1 : portraits + titre + Peer Gynt -> Menu langues)
+    renderWelcomePortraits();
+    el.welcomeScreen.classList.remove('hidden');
+    startIntroSplashSequence();
   }
 
   function setSheetCollapsed(collapsed) {
