@@ -13,7 +13,7 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v27';
+  const AUDIO_VER = 'v28';
   const RETURN_STEP_ID = 99;
 
   const FLAG_SVGS = {
@@ -80,6 +80,7 @@
     welcomeCard: document.getElementById('welcome-card'),
     welcomeLangGrid: document.getElementById('welcome-lang-grid'),
     introAudio: document.getElementById('intro-audio'),
+    outroAudio: document.getElementById('outro-audio'),
     welcomeTag: document.getElementById('welcome-tag'),
     welcomeTitle: document.getElementById('welcome-title'),
     welcomeSubtitle: document.getElementById('welcome-subtitle'),
@@ -1254,6 +1255,33 @@
     }
   }
 
+  function startOutroMusic() {
+    if (!el.outroAudio) return;
+    stopIntroMusic();
+    el.outroAudio.volume = 0.72;
+    el.outroAudio.currentTime = 0;
+    const p = el.outroAudio.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        // Si le navigateur bloque la lecture auto, premier clic sur l'écran de fin lance la musique
+        const unlock = () => {
+          if (!el.endScreen.classList.contains('hidden') && !spiralPaused && el.outroAudio.paused) {
+            el.outroAudio.play().catch(() => {});
+          }
+          el.endScreen.removeEventListener('pointerdown', unlock);
+        };
+        el.endScreen.addEventListener('pointerdown', unlock, { once: true });
+      });
+    }
+  }
+
+  function stopOutroMusic() {
+    if (el.outroAudio && !el.outroAudio.paused) {
+      el.outroAudio.pause();
+      el.outroAudio.currentTime = 0;
+    }
+  }
+
   // ---------- Page de fin : JLDApps 2026 ----------
   function openEndScreen() {
     el.audio.pause();
@@ -1275,11 +1303,13 @@
 
     el.endScreen.classList.remove('hidden');
     initSpiralCredits();
+    startOutroMusic();
   }
 
   function openWelcomeScreen() {
     el.audio.pause();
     stopIntroMusic();
+    stopOutroMusic();
     stopSpiralCredits();
     el.endScreen.classList.add('hidden');
     el.listModal.classList.add('hidden');
@@ -1376,6 +1406,7 @@
     // Page de fin JLDApps 2026 & génrique 3D
     el.btnEndBackMap.addEventListener('click', () => {
       stopSpiralCredits();
+      stopOutroMusic();
       el.endScreen.classList.add('hidden');
     });
     el.btnEndRestart.addEventListener('click', openWelcomeScreen);
@@ -1383,6 +1414,13 @@
       el.btnSpiralToggle.addEventListener('click', () => {
         spiralPaused = !spiralPaused;
         el.btnSpiralToggle.textContent = spiralPaused ? '▶' : '⏸';
+        if (el.outroAudio) {
+          if (spiralPaused) {
+            el.outroAudio.pause();
+          } else {
+            el.outroAudio.play().catch(() => {});
+          }
+        }
       });
     }
     el.btnOpenEndFromList.addEventListener('click', () => {
