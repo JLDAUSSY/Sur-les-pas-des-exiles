@@ -213,7 +213,7 @@
   }
 
   function getAudioUrlForStep(step) {
-    const num = String(step.id).padStart(2, '0');
+    const num = String(step.audioId || step.id).padStart(2, '0');
     if (state.lang === 'fr') {
       return `audio/etape-${num}.mp3?${AUDIO_VER}`;
     }
@@ -606,8 +606,8 @@
     stepMarkers.clear();
 
     const allCoords = [];
-    for (let i = 1; i < maxId; i++) {
-      const seg = SEGMENTS[`${i}-${i + 1}`];
+    for (let i = 0; i < storySteps.length - 1; i++) {
+      const seg = SEGMENTS[`${storySteps[i].id}-${storySteps[i + 1].id}`];
       if (seg && seg.coords) allCoords.push(seg.coords);
     }
     routeBgLayer = L.polyline(allCoords, {
@@ -645,18 +645,20 @@
   }
 
   function createStepIcon(stepId) {
+    const stepObj = getStepById(stepId);
     const isCurrent = stepId === state.currentStepId || (stepId === 1 && state.currentStepId === RETURN_STEP_ID);
     const isVisited = state.visitedIds.has(stepId);
     const cls = ['step-marker-pin'];
     if (isVisited) cls.push('is-visited');
     if (isCurrent) cls.push('is-current');
     const size = isCurrent ? 38 : 32;
+    const badgeStr = (stepObj && stepObj.badge) ? stepObj.badge : String(stepId);
     const label =
       stepId === 1 && state.currentStepId === RETURN_STEP_ID
         ? '↺'
         : isVisited && !isCurrent
         ? '✓'
-        : String(stepId);
+        : badgeStr;
 
     return L.divIcon({
       className: '',
@@ -679,15 +681,17 @@
       routeActiveLayer = null;
     }
     const storySteps = getActiveSteps().filter((s) => !s.isReturn);
-    const maxId = storySteps[storySteps.length - 1].id;
     let segKey = null;
 
     if (state.currentStepId === RETURN_STEP_ID) {
       segKey = state.loop === 'short' ? '6-1' : '13-1';
-    } else if (state.currentStepId > 1) {
-      segKey = `${state.currentStepId - 1}-${state.currentStepId}`;
-    } else if (maxId >= 2) {
-      segKey = '1-2';
+    } else {
+      const idx = storySteps.findIndex((s) => s.id === state.currentStepId);
+      if (idx > 0) {
+        segKey = `${storySteps[idx - 1].id}-${storySteps[idx].id}`;
+      } else if (storySteps.length >= 2) {
+        segKey = `${storySteps[0].id}-${storySteps[1].id}`;
+      }
     }
 
     if (segKey && SEGMENTS[segKey] && SEGMENTS[segKey].coords) {
@@ -1129,7 +1133,7 @@
       const isVisited = state.visitedIds.has(step.id);
       const isActive = step.id === state.currentStepId;
       btn.className = `step-list-item${isVisited ? ' is-visited' : ''}${isActive ? ' is-active' : ''}`;
-      const numLabel = step.isReturn ? '↺' : isVisited && !isActive ? '✓' : step.id;
+      const numLabel = step.isReturn ? '↺' : isVisited && !isActive ? '✓' : (step.badge || step.id);
       btn.innerHTML = `
         <span class="step-list-num">${numLabel}</span>
         <div class="step-list-info">
