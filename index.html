@@ -20,7 +20,7 @@
 
   <!-- Leaflet 1.9.4 -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=17" />
 </head>
 <body>
   <!-- ====================================================================
@@ -262,8 +262,8 @@
         <audio id="audio-element" preload="metadata"></audio>
       </div>
 
-      <!-- Résumé historique & personnalités -->
-      <div class="step-story-box">
+      <!-- Bloc texte masqué (la narration MP3 remplace le texte écrit) -->
+      <div class="step-story-box hidden" aria-hidden="true">
         <div id="step-tags" class="step-tags"></div>
         <p id="step-summary" class="step-summary"></p>
         <p id="step-note" class="step-note"></p>
