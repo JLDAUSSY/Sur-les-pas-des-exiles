@@ -9,7 +9,7 @@ window.I18N_STEPS = {
       secteurNom: "Sector 1: The Harbour & Village Heart",
       titre: "Departure & General Memorial Plaque",
       lieu: "Sanary Tourist Office (1 Quai du Levant) — Forecourt and surroundings",
-      resume: "A large commemorative plaque lists the 68 writers, painters, musicians and thinkers who found refuge in Sanary after Hitler came to power in 1933. Nearby stand the lectern and oak tree dedicated to Romain Gary (born Roman Kacew in Vilnius in 1914), Resistance fighter, Companion of the Liberation and humanist novelist.",
+      resume: "A large commemorative plaque lists the 68 writers, painters, musicians and thinkers who found refuge in Sanary after Hitler came to power in 1933. This cosmopolitan community brought together Jewish figures fleeing antisemitic persecution, non-Jewish political and intellectual opponents rejecting the Nazi dictatorship, and foreign artists and sympathisers united in solidarity. Nearby stand the lectern and oak tree dedicated to Romain Gary (born Roman Kacew in Vilnius in 1914), Resistance fighter, Companion of the Liberation and humanist novelist.",
       notePratique: "Starting and finishing point for both loops (short 3 km and full 8 km)."
     },
     2: {
@@ -102,7 +102,7 @@ window.I18N_STEPS = {
       secteurNom: "Sektor 1: Hafen & Ortskern",
       titre: "Start & Allgemeine Gedenktafel",
       lieu: "Touristeninformation Sanary (1 Quai du Levant) — Vorplatz",
-      resume: "Eine große Gedenktafel nennt die 68 Schriftsteller, Maler, Musiker und Denker, die nach Hitlers Machtergreifung 1933 in Sanary Zuflucht fanden. Ganz in der Nähe stehen zudem das Pult und die Eiche zu Ehren von Romain Gary (geboren 1914 als Roman Kacew in Vilnius), Widerstandskämpfer und humanistischer Romancier.",
+      resume: "Eine große Gedenktafel nennt die 68 Schriftsteller, Maler, Musiker und Denker, die nach Hitlers Machtergreifung 1933 in Sanary Zuflucht fanden. Diese weltoffene Gemeinschaft vereinte jüdische Persönlichkeiten auf der Flucht vor antisemitischer Verfolgung, nichtjüdische politische und intellektuelle Gegner des NS-Regimes sowie ausländische Künstler und Sympathisanten. Ganz in der Nähe stehen zudem das Pult und die Eiche zu Ehren von Romain Gary (geboren 1914 als Roman Kacew in Vilnius), Widerstandskämpfer und humanistischer Romancier.",
       notePratique: "Start- und Zielpunkt beider Rundwege (kurze Runde 3 km und große Runde 8 km)."
     },
     2: {
@@ -195,7 +195,7 @@ window.I18N_STEPS = {
       secteurNom: "Sector 1: De Haven en het Dorpshart",
       titre: "Start & Algemene Gedenkplaat",
       lieu: "VVV-kantoor van Sanary (1 Quai du Levant) — Voorplein",
-      resume: "Een grote gedenkplaat vermeldt de 68 schrijvers, schilders, musici en denkers die na 1933 hun toevlucht zochten in Sanary. Vlakbij staan ook het informatiebord en de eik ter ere van Romain Gary (geboren in 1914 in Vilnius), verzetsstrijder en humanistisch romanschrijver.",
+      resume: "Een grote gedenkplaat vermeldt de 68 schrijvers, schilders, musici en denkers die na 1933 hun toevlucht zochten in Sanary. Deze kosmopolitische gemeenschap bracht Joodse vluchtelingen voor antisemitische vervolging, niet-Joodse politieke en intellectuele tegenstanders van het naziregime en buitenlandse kunstenaars en sympathisanten samen. Vlakbij staan ook het informatiebord en de eik ter ere van Romain Gary (geboren in 1914 in Vilnius), verzetsstrijder en humanistisch romanschrijver.",
       notePratique: "Start- en eindpunt van beide lussen (korte lus 3 km en volledige lus 8 km)."
     },
     2: {
@@ -288,7 +288,7 @@ window.I18N_STEPS = {
       secteurNom: "Sector 1: El Puerto y el Corazón del Pueblo",
       titre: "Salida y Placa Conmemorativa General",
       lieu: "Oficina de Turismo de Sanary (1 Quai du Levant) — Explanada",
-      resume: "Una gran placa conmemorativa recuerda los nombres de los 68 escritores, pintores, músicos y pensadores que hallaron refugio en Sanary tras la llegada de Hitler al poder en 1933. Muy cerca se encuentran también el atril y el roble dedicados a Romain Gary (nacido en Vilna en 1914), resistente y novelista humanista.",
+      resume: "Una gran placa conmemorativa recuerda los nombres de los 68 escritores, pintores, músicos y pensadores que hallaron refugio en Sanary tras la llegada de Hitler al poder en 1933. Esta comunidad cosmopolita reunía a personalidades judías que huían de la persecución antisemita, opositores políticos e intelectuales no judíos del régimen nazi y artistas extranjeros simpatizantes. Muy cerca se encuentran también el atril y el roble dedicados a Romain Gary (nacido en Vilna en 1914), resistente y novelista humanista.",
       notePratique: "Punto de salida y llegada de ambos recorridos (ruta corta 3 km y ruta completa 8 km)."
     },
     2: {
@@ -381,7 +381,7 @@ window.I18N_STEPS = {
       secteurNom: "Settore 1: Il Porto e il Cuore del Borgo",
       titre: "Partenza e Targa Commemorativa Generale",
       lieu: "Ufficio del Turismo di Sanary (1 Quai du Levant) — Piazzale",
-      resume: "Una grande targa commemorativa raccoglie i nomi dei 68 scrittori, pittori, musicisti e pensatori rifugiatisi a Sanary dopo l'ascesa al potere di Hitler nel 1933. Nelle vicinanze si trovano anche il leggio e la quercia dedicati a Romain Gary (nato a Vilnius nel 1914), partigiano e romanziere umanista.",
+      resume: "Una grande targa commemorativa raccoglie i nomi dei 68 scrittori, pittori, musicisti e pensatori rifugiatisi a Sanary dopo l'ascesa al potere di Hitler nel 1933. Questa comunità cosmopolita riuniva personalità ebraiche in fuga dalle persecuzioni antisemite, oppositori politici e intellettuali non ebrei del regime nazista e artisti stranieri simpatizzanti. Nelle vicinanze si trovano anche il leggio e la quercia dedicati a Romain Gary (nato a Vilnius nel 1914), partigiano e romanziere umanista.",
       notePratique: "Punto di partenza e arrivo di entrambi gli anelli (breve 3 km e completo 8 km)."
     },
     2: {
@@ -474,7 +474,7 @@ window.I18N_STEPS = {
       secteurNom: "Sektor 1: Port i Serce Miasteczka",
       titre: "Start i Główna Tablica Pamiątkowa",
       lieu: "Biuro Turystyczne w Sanary (1 Quai du Levant) — Plac przed wejściem",
-      resume: "Duża tablica pamiątkowa upamiętnia 68 pisarzy, malarzy, muzyków i myślicieli, którzy znaleźli schronienie w Sanary po dojściu Hitlera do władzy w 1933 roku. Tuż obok znajdują się pulpit i dąb poświęcone Romainowi Gary'emu (urodzonemu w Wilnie w 1914 roku), bojownikowi ruchu oporu i humanistycznemu powieściopisarzowi.",
+      resume: "Duża tablica pamiątkowa upamiętnia 68 pisarzy, malarzy, muzyków i myślicieli, którzy znaleźli schronienie w Sanary po dojściu Hitlera do władzy w 1933 roku. Ta kosmopolityczna społeczność łączyła osoby pochodzenia żydowskiego uciekające przed prześladowaniami antysemickimi, nieżydowskich przeciwników politycznych i intelektualnych reżimu nazistowskiego oraz zagranicznych artystów i sympatyków. Tuż obok znajdują się pulpit i dąb poświęcone Romainowi Gary'emu (urodzonemu w Wilnie w 1914 roku), bojownikowi ruchu oporu i humanistycznemu powieściopisarzowi.",
       notePratique: "Punkt startu i mety obu pętli (krótkiej 3 km oraz pełnej 8 km)."
     },
     2: {
@@ -567,7 +567,7 @@ window.I18N_STEPS = {
       secteurNom: "1구역: 항구와 구시가지",
       titre: "출발점 및 종합 기념 명판",
       lieu: "사나리 관광안내소 (1 Quai du Levant) 앞 광장",
-      resume: "대형 기념 명판에는 1933년 히틀러의 집권 이후 사나리로 피신한 68명의 작가, 화가, 음악가, 사상가의 이름이 새겨져 있습니다. 인근에는 레지스탕스 투사이자 인문주의 소설가 로맹 가리(1914년 빌뉴스 출생)를 기리는 안내판과 참나무도 자리하고 있습니다.",
+      resume: "대형 기념 명판에는 1933년 히틀러의 집권 이후 사나리로 피신한 68명의 작가, 화가, 음악가, 사상가의 이름이 새겨져 있습니다. 이 국제적인 공동체에는 반유대주의 박해를 피해 온 유대인 인사들, 나치 독재에 맞선 비유대인 정치·지성인 반대파들, 그리고 현지에 정착했거나 연대한 외국인 예술가와 공감자들이 모두 함께했습니다. 인근에는 레지스탕스 투사이자 인문주의 소설가 로맹 가리(1914년 빌뉴스 출생)를 기리는 안내판과 참나무도 자리하고 있습니다.",
       notePratique: "단축 코스(3 km)와 전체 코스(8 km) 모두의 출발점이자 도착점입니다."
     },
     2: {
