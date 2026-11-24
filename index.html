@@ -20,7 +20,7 @@
 
   <!-- Leaflet 1.9.4 -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=21" />
+  <link rel="stylesheet" href="styles.css?v=22" />
 </head>
 <body>
   <!-- ====================================================================
@@ -209,21 +209,24 @@
     </button>
 
     <div class="sheet-content">
-      <div class="step-header-row">
-        <div class="step-meta">
-          <span id="step-sector-pill" class="sector-pill">Secteur 1 • Étape 1 / 13</span>
-          <span id="step-visited-pill" class="visited-pill hidden">✓ Visitée</span>
+      <!-- Boîte Étape adaptative : Côte-à-côte pour les photos PORTRAIT / Empilée pleine largeur pour les photos PAYSAGE -->
+      <div id="step-hero" class="step-hero is-landscape">
+        <div class="step-header-row">
+          <div class="step-meta">
+            <span id="step-sector-pill" class="sector-pill">Secteur 1 • Étape 1 / 13</span>
+            <span id="step-visited-pill" class="visited-pill hidden">✓ Visitée</span>
+          </div>
+          <h2 id="step-title" class="step-title">Départ &amp; Plaque commémorative générale</h2>
+          <p id="step-location" class="step-location">📍 Office de Tourisme de Sanary (1 Quai du Levant)</p>
         </div>
-        <h2 id="step-title" class="step-title">Départ &amp; Plaque commémorative générale</h2>
-        <p id="step-location" class="step-location">📍 Office de Tourisme de Sanary (1 Quai du Levant)</p>
-      </div>
 
-      <!-- Photo en relation avec le point -->
-      <figure class="step-photo-card">
-        <img id="step-image" src="images/etape-01.jpg" alt="Photo de l'étape" loading="eager" />
-        <button id="btn-zoom-photo" class="photo-zoom-btn" title="Agrandir la photo" aria-label="Agrandir la photo">⤢</button>
-        <figcaption id="step-image-credit" class="step-photo-credit">Port de Sanary-sur-Mer</figcaption>
-      </figure>
+        <!-- Photo en relation avec le point -->
+        <figure class="step-photo-card">
+          <img id="step-image" src="images/etape-01.jpg" alt="Photo de l'étape" loading="eager" />
+          <button id="btn-zoom-photo" class="photo-zoom-btn" title="Agrandir la photo" aria-label="Agrandir la photo">⤢</button>
+          <figcaption id="step-image-credit" class="step-photo-credit">Port de Sanary-sur-Mer</figcaption>
+        </figure>
+      </div>
 
       <!-- Lecteur Audio MP3 dédié (Bouton triangulaire Play + Pause + Replay) -->
       <div class="audio-player-box">
@@ -370,6 +373,6 @@
   <script src="data/etapes.js?v=11"></script>
   <script src="data/i18n.js?v=8"></script>
   <script src="data/i18n_steps.js?v=5"></script>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
