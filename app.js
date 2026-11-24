@@ -76,15 +76,14 @@
   const el = {
     welcomeScreen: document.getElementById('welcome-screen'),
     welcomeWall: document.getElementById('welcome-portraits-wall'),
+    welcomeSplash: document.getElementById('welcome-splash'),
+    welcomeCard: document.getElementById('welcome-card'),
+    welcomeLangGrid: document.getElementById('welcome-lang-grid'),
+    introAudio: document.getElementById('intro-audio'),
     welcomeTag: document.getElementById('welcome-tag'),
     welcomeTitle: document.getElementById('welcome-title'),
     welcomeSubtitle: document.getElementById('welcome-subtitle'),
-    welcomeIntro: document.getElementById('welcome-intro'),
     welcomeChooseLang: document.getElementById('welcome-choose-lang'),
-    btnWelcomeLangTrigger: document.getElementById('btn-welcome-lang-trigger'),
-    welcomeLangCurrentFlag: document.getElementById('welcome-lang-current-flag'),
-    welcomeLangCurrentName: document.getElementById('welcome-lang-current-name'),
-    welcomeLangCurrentCode: document.getElementById('welcome-lang-current-code'),
     langMenuOverlay: document.getElementById('lang-menu-overlay'),
     langMenuTitle: document.getElementById('lang-menu-title'),
     langMenuList: document.getElementById('lang-menu-list'),
@@ -267,7 +266,6 @@
     el.welcomeTag.textContent = t('welcomeTag');
     el.welcomeTitle.textContent = t('appTitle');
     el.welcomeSubtitle.textContent = t('appSubtitle');
-    el.welcomeIntro.textContent = t('welcomeIntro');
     el.welcomeChooseLang.textContent = t('chooseLang');
     el.welcomeChooseLoop.textContent = t('chooseLoop');
     el.welcomeLoopShortTitle.textContent = t('loopShortTitle');
@@ -276,14 +274,10 @@
     el.welcomeLoopFullDesc.textContent = t('loopFullDesc');
     el.welcomeStartLabel.textContent = t('startBtn');
 
-    // Met à jour la capsule moderne de langue (accueil + en-tête)
+    // Met à jour la grille translucide des 8 langues sur l'accueil + drapeau en-tête
     const curFlagSvg = FLAG_SVGS[state.lang] || FLAG_SVGS.fr;
-    const curLangName = (UI_DICT[state.lang] && UI_DICT[state.lang].langName) || 'Français';
-    const curLangLabel = (UI_DICT[state.lang] && UI_DICT[state.lang].label) || 'FR';
-    if (el.welcomeLangCurrentFlag) el.welcomeLangCurrentFlag.innerHTML = curFlagSvg;
-    if (el.welcomeLangCurrentName) el.welcomeLangCurrentName.textContent = curLangName;
-    if (el.welcomeLangCurrentCode) el.welcomeLangCurrentCode.textContent = curLangLabel;
     if (el.langMenuTitle) el.langMenuTitle.textContent = t('chooseLang');
+    renderWelcomeLangGrid();
 
     // En-tête
     el.headerTitle.textContent = t('appTitle');
@@ -333,6 +327,76 @@
     applyLanguageToUI();
     // Recharge l'étape active (texte + audio dans la nouvelle langue)
     selectStep(state.currentStepId, { openSheet: false, panToStep: false });
+  }
+
+  let splashTimerId = null;
+
+  function renderWelcomeLangGrid() {
+    if (!el.welcomeLangGrid) return;
+    el.welcomeLangGrid.innerHTML = '';
+    LANG_ORDER.forEach((code) => {
+      const d = UI_DICT[code];
+      if (!d) return;
+      const isAct = code === state.lang;
+      const btn = document.createElement('button');
+      btn.className = `lang-menu-option${isAct ? ' active' : ''}`;
+      btn.dataset.lang = code;
+      btn.setAttribute('role', 'option');
+      btn.setAttribute('aria-selected', String(isAct));
+      btn.innerHTML = `
+        <span class="lang-circle-flag">${FLAG_SVGS[code]}</span>
+        <span class="lang-menu-option-text">
+          <span class="lang-menu-option-name">${d.langName}</span>
+          <span class="lang-menu-option-code">${d.label} • MP3</span>
+        </span>
+        ${isAct ? '<span class="lang-menu-check">✓</span>' : ''}
+      `;
+      btn.addEventListener('click', () => setLanguage(code));
+      el.welcomeLangGrid.appendChild(btn);
+    });
+  }
+
+  function showWelcomeMenu() {
+    if (splashTimerId) {
+      clearTimeout(splashTimerId);
+      splashTimerId = null;
+    }
+    if (!el.welcomeSplash || el.welcomeSplash.classList.contains('hidden')) {
+      if (el.welcomeCard) el.welcomeCard.classList.remove('hidden');
+      return;
+    }
+    el.welcomeSplash.classList.add('is-leaving');
+    setTimeout(() => {
+      el.welcomeSplash.classList.add('hidden');
+      el.welcomeSplash.classList.remove('is-leaving');
+      el.welcomeScreen.classList.remove('is-splash');
+      if (el.welcomeCard) el.welcomeCard.classList.remove('hidden');
+    }, 480);
+  }
+
+  function startIntroSplashSequence() {
+    if (!el.welcomeSplash || !el.welcomeCard) return;
+    el.welcomeSplash.classList.remove('hidden', 'is-leaving');
+    el.welcomeCard.classList.add('hidden');
+    el.welcomeScreen.classList.add('is-splash');
+
+    // Tente de lancer Peer Gynt en ouverture (automatique dans l'APK Android)
+    if (el.introAudio) {
+      el.introAudio.currentTime = 0;
+      const p = el.introAudio.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    }
+
+    // Passage fluide vers le menu linguistique translucide après ~4,5 s
+    if (splashTimerId) clearTimeout(splashTimerId);
+    splashTimerId = setTimeout(showWelcomeMenu, 4500);
+  }
+
+  function stopIntroMusic() {
+    if (el.introAudio && !el.introAudio.paused) {
+      el.introAudio.pause();
+      el.introAudio.currentTime = 0;
+    }
   }
 
   function openLangMenu() {
@@ -1167,12 +1231,15 @@
 
   function openWelcomeScreen() {
     el.audio.pause();
+    stopIntroMusic();
     stopSpiralCredits();
     el.endScreen.classList.add('hidden');
     el.listModal.classList.add('hidden');
     el.photoLightbox.classList.add('hidden');
     renderWelcomePortraits(); // Nouvelle disposition aléatoire à chaque ouverture !
-    el.welcomeScreen.classList.remove('hidden');
+    if (el.welcomeSplash) el.welcomeSplash.classList.add('hidden');
+    if (el.welcomeCard) el.welcomeCard.classList.remove('hidden');
+    el.welcomeScreen.classList.remove('hidden', 'is-splash');
   }
 
   function setSheetCollapsed(collapsed) {
@@ -1208,10 +1275,18 @@
       saveState();
     }
 
-    // Menu moderne de langue (depuis la page d'accueil ET depuis l'en-tête de la carte)
-    if (el.btnWelcomeLangTrigger) {
-      el.btnWelcomeLangTrigger.addEventListener('click', openLangMenu);
+    // Acte 1 -> Acte 2 au clic/tap si l'utilisateur souhaite passer plus vite
+    if (el.welcomeSplash) {
+      el.welcomeSplash.addEventListener('click', () => {
+        if (el.introAudio && el.introAudio.paused) {
+          const p = el.introAudio.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        }
+        showWelcomeMenu();
+      });
     }
+
+    // Menu moderne de langue (depuis l'en-tête de la carte)
     if (el.btnCloseLangMenu) {
       el.btnCloseLangMenu.addEventListener('click', () => el.langMenuOverlay.classList.add('hidden'));
     }
@@ -1229,6 +1304,7 @@
 
     // Démarrer depuis la page d'accueil
     el.btnStartWalk.addEventListener('click', () => {
+      stopIntroMusic();
       el.welcomeScreen.classList.add('hidden');
       if (state.currentStepId === RETURN_STEP_ID) {
         selectStep(1, { openSheet: true, panToStep: false });
@@ -1390,6 +1466,7 @@
     startGpsWatch();
     requestWakeLock();
     registerServiceWorker();
+    startIntroSplashSequence();
   }
 
   document.addEventListener('DOMContentLoaded', boot);
