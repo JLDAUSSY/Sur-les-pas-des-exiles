@@ -13,7 +13,7 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v29';
+  const AUDIO_VER = 'v30';
   const RETURN_STEP_ID = 99;
 
   const FLAG_SVGS = {
