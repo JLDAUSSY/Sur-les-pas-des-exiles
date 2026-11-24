@@ -1,7 +1,7 @@
 // Service Worker PWA — Sur les pas des exilés à Sanary (technologie RandoTracker)
 // Cache applicatif (Network-First), médias audio/photo (Cache-First) et tuiles cartographiques (Cache-First).
 
-const APP_CACHE = 'sanary-exiles-app-v20';
+const APP_CACHE = 'sanary-exiles-app-v21';
 const MEDIA_CACHE = 'sanary-exiles-media-v18';
 const TILE_CACHE = 'sanary-exiles-tiles-v1';
 
