@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a4b6e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="description" content="Audioguide GPS et parcours de mémoire — Sur les pas des exilés à Sanary-sur-Mer (1933–1940)." />
+  <title>Sur les pas des exilés — Sanary-sur-Mer</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="images/icon.svg" />
+  <link rel="apple-touch-icon" href="images/icon.svg" />
+
+  <!-- Typographie patrimoniale (avec repli système instantané hors-ligne) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet 1.9.4 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css?v=12" />
+</head>
+<body>
+  <!-- ====================================================================
+       PAGE D'ACCUEIL — Mosaïque aléatoire de portraits d'écrivains & Langues
+       ==================================================================== -->
+  <section id="welcome-screen" class="welcome-screen" aria-label="Accueil">
+    <!-- Mur de portraits généré aléatoirement à chaque ouverture -->
+    <div id="welcome-portraits-wall" class="welcome-portraits-wall" aria-hidden="true"></div>
+    <div class="welcome-scrim" aria-hidden="true"></div>
+
+    <div class="welcome-card">
+      <div class="welcome-emblem-row">
+        <img src="images/icon.svg" alt="" class="welcome-logo" />
+        <span id="welcome-tag" class="welcome-tag">Parcours de mémoire • Audioguide GPS</span>
+      </div>
+
+      <h1 id="welcome-title" class="welcome-title">Sur les pas des exilés</h1>
+      <p id="welcome-subtitle" class="welcome-subtitle">Sanary-sur-Mer • 1933–1940</p>
+      <p id="welcome-intro" class="welcome-intro">
+        Marchez sur les traces des 68 écrivains, peintres et penseurs européens réfugiés à Sanary-sur-Mer entre 1933 et 1940.
+      </p>
+
+      <!-- Sélecteur de langue haut de gamme (Capsule éditoriale + menu vitré nuit méditerranéenne) -->
+      <div class="welcome-section">
+        <div id="welcome-choose-lang" class="welcome-section-label">Choisissez votre langue (interface &amp; audio)</div>
+        <div class="modern-lang-wrap">
+          <button id="btn-welcome-lang-trigger" class="modern-lang-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="modern-lang-left">
+              <span id="welcome-lang-current-flag" class="lang-circle-flag"></span>
+              <span class="modern-lang-meta">
+                <span id="welcome-lang-current-name" class="modern-lang-name">Français</span>
+                <span id="welcome-lang-current-sub" class="modern-lang-sub">Interface &amp; Audio MP3</span>
+              </span>
+            </span>
+            <span class="modern-lang-right">
+              <span id="welcome-lang-current-code" class="modern-lang-code">FR</span>
+              <svg class="modern-lang-chevron" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Choix de la boucle -->
+      <div class="welcome-section">
+        <div id="welcome-choose-loop" class="welcome-section-label">Choisissez votre parcours</div>
+        <div class="welcome-loop-grid">
+          <button id="welcome-loop-short" class="welcome-loop-card" data-loop="short">
+            <strong id="welcome-loop-short-title">Boucle courte</strong>
+            <span id="welcome-loop-short-desc">~3 km • 1h15 • Étapes 1 à 6 (Port &amp; Village)</span>
+          </button>
+          <button id="welcome-loop-full" class="welcome-loop-card active" data-loop="full">
+            <strong id="welcome-loop-full-title">Boucle complète</strong>
+            <span id="welcome-loop-full-desc">~8 km • 3h00 • Étapes 1 à 13 + Littoral</span>
+          </button>
+        </div>
+      </div>
+
+      <button id="btn-start-walk" class="welcome-start-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <polygon points="6,4 20,12 6,20"/>
+        </svg>
+        <span id="welcome-start-label">Commencer le parcours</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       EN-TÊTE PATRIMONIAL
+       ==================================================================== -->
+  <header class="app-header">
+    <div class="header-brand">
+      <button id="btn-open-welcome" class="brand-home-btn" title="Retour à l'accueil" aria-label="Retour à l'accueil">
+        <img src="images/icon.svg" alt="" class="brand-logo" />
+      </button>
+      <div class="brand-titles">
+        <h1 id="header-title">Sur les pas des exilés</h1>
+        <p id="header-subtitle" class="brand-subtitle">Sanary-sur-Mer • 1933–1940</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btn-home-header" class="home-pill-btn btn-home-any" title="Retour à l'accueil" aria-label="Retour à l'accueil">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12 3.2L3 10.6V20a1 1 0 0 0 1 1h5.5v-6h5v6H20a1 1 0 0 0 1-1v-9.4L12 3.2z"/></svg>
+        <span class="home-pill-text">Home</span>
+      </button>
+      <button id="btn-header-lang" class="lang-pill-header" title="Changer de langue" aria-label="Changer de langue"></button>
+      <div class="loop-switcher" role="group" aria-label="Choix de la boucle">
+        <button id="btn-loop-short" class="loop-btn" data-loop="short">3 km</button>
+        <button id="btn-loop-full" class="loop-btn active" data-loop="full">8 km</button>
+      </div>
+      <button id="btn-open-list" class="icon-btn" aria-label="Liste des étapes" title="Liste des étapes">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+          <circle cx="4" cy="6" r="1.3" fill="currentColor"/><circle cx="4" cy="12" r="1.3" fill="currentColor"/><circle cx="4" cy="18" r="1.3" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Bandeau de guidage GPS permanent -->
+  <section class="guidance-bar" aria-live="polite">
+    <div class="guidance-left">
+      <span id="guidance-badge" class="guidance-step-badge">1</span>
+      <div class="guidance-text">
+        <div id="guidance-label" class="guidance-label">Cap vers l'Étape 1</div>
+        <div id="guidance-title" class="guidance-title">Départ &amp; Plaque commémorative générale</div>
+      </div>
+    </div>
+    <div class="guidance-right">
+      <div id="guidance-arrow" class="guidance-compass" title="Direction vers l'étape cible">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <polygon points="12,2 19,20 12,16 5,20"/>
+        </svg>
+      </div>
+      <div class="guidance-metrics">
+        <span id="guidance-distance" class="guidance-distance">-- m</span>
+        <span id="guidance-eta" class="guidance-eta">GPS…</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Zone cartographique plein écran -->
+  <main class="map-wrapper">
+    <div id="map" role="region" aria-label="Carte du parcours à Sanary-sur-Mer"></div>
+
+    <!-- Pastille d'état GPS (style RandoTracker) -->
+    <div id="gps-pill" class="gps-pill" role="status">
+      <span class="gps-dot"></span>
+      <span id="gps-pill-text">Acquisition GPS…</span>
+    </div>
+
+    <!-- Notification d'arrivée sur une étape (geofencing) -->
+    <div id="arrival-toast" class="arrival-toast hidden" role="alert">
+      <span class="arrival-icon">📍</span>
+      <div class="arrival-body">
+        <strong id="arrival-toast-title">Vous êtes arrivé !</strong>
+        <span id="arrival-toast-sub">Appuyez sur le bouton ▶ pour écouter l'histoire</span>
+      </div>
+      <button id="arrival-toast-close" class="toast-close" aria-label="Fermer">✕</button>
+    </div>
+
+    <!-- Boutons flottants carto (FAB RandoTracker) -->
+    <div class="map-fabs">
+      <button id="btn-recenter" class="fab-btn is-following" title="Centrer et suivre ma position GPS" aria-label="Suivi GPS">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="12" cy="12" r="9"/>
+          <line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/>
+          <line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/>
+        </svg>
+      </button>
+
+      <button id="btn-layer" class="fab-btn" title="Changer le fond de carte (IGN / OSM / Satellite)" aria-label="Fonds de carte">
+        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+          <polyline points="2 12 12 17 22 12"/>
+          <polyline points="2 17 12 22 22 17"/>
+        </svg>
+      </button>
+
+      <button id="btn-fit-route" class="fab-btn" title="Voir tout le parcours" aria-label="Voir tout le parcours">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+          <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>
+      </button>
+
+      <button id="btn-sim-gps" class="fab-btn fab-demo" title="Simuler un déplacement GPS vers l'étape affichée" aria-label="Simulation GPS">
+        <span id="fab-demo-label" class="fab-demo-label">Démo</span>
+      </button>
+    </div>
+
+    <!-- Menu sélecteur de fond de carte -->
+    <div id="layer-popover" class="layer-popover hidden" role="menu">
+      <div id="popover-layer-title" class="popover-title">Fond de carte</div>
+      <button id="layer-opt-ign" class="layer-option active" data-layer="ign">🗺️ Plan IGN France</button>
+      <button id="layer-opt-osm" class="layer-option" data-layer="osm">🏙️ OpenStreetMap</button>
+      <button id="layer-opt-esri" class="layer-option" data-layer="esri">🛰️ Vue Satellite</button>
+    </div>
+  </main>
+
+  <!-- Fiche d'étape (Tiroir inférieur mobile avec Photo + Lecteur Audio MP3) -->
+  <section id="step-sheet" class="step-sheet" aria-label="Fiche de l'étape sélectionnée">
+    <button id="sheet-toggle-bar" class="sheet-handle-bar" aria-label="Déplier ou replier la fiche">
+      <span class="sheet-handle-pill"></span>
+      <span id="sheet-toggle-hint" class="sheet-toggle-hint">Masquer la fiche</span>
+    </button>
+
+    <div class="sheet-content">
+      <div class="step-header-row">
+        <div class="step-meta">
+          <span id="step-sector-pill" class="sector-pill">Secteur 1 • Étape 1 / 13</span>
+          <span id="step-visited-pill" class="visited-pill hidden">✓ Visitée</span>
+        </div>
+        <h2 id="step-title" class="step-title">Départ &amp; Plaque commémorative générale</h2>
+        <p id="step-location" class="step-location">📍 Office de Tourisme de Sanary (1 Quai du Levant)</p>
+      </div>
+
+      <!-- Photo en relation avec le point -->
+      <figure class="step-photo-card">
+        <img id="step-image" src="images/etape-01.jpg" alt="Photo de l'étape" loading="eager" />
+        <button id="btn-zoom-photo" class="photo-zoom-btn" title="Agrandir la photo" aria-label="Agrandir la photo">⤢</button>
+        <figcaption id="step-image-credit" class="step-photo-credit">Port de Sanary-sur-Mer</figcaption>
+      </figure>
+
+      <!-- Lecteur Audio MP3 dédié (Bouton triangulaire Play + Pause + Replay) -->
+      <div class="audio-player-box">
+        <div class="audio-controls-row">
+          <button id="btn-audio-play" class="btn-play-triangle" aria-label="Démarrer l'histoire audio" title="Démarrer l'histoire">
+            <svg class="triangle-svg" viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">
+              <polygon points="10,6 39,22 10,38" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            </svg>
+            <span class="btn-play-label">Écouter</span>
+          </button>
+
+          <button id="btn-audio-pause" class="btn-audio-secondary" aria-label="Mettre en pause" title="Pause" disabled>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+              <rect x="6" y="4" width="4.5" height="16" rx="1.2"/>
+              <rect x="13.5" y="4" width="4.5" height="16" rx="1.2"/>
+            </svg>
+            <span id="btn-pause-label">Pause</span>
+          </button>
+
+          <button id="btn-audio-replay" class="btn-audio-secondary" aria-label="Réécouter depuis le début" title="Replay">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            <span id="btn-replay-label">Replay</span>
+          </button>
+        </div>
+
+        <div class="audio-progress-row">
+          <span id="audio-current-time" class="audio-time">0:00</span>
+          <input id="audio-seek" type="range" min="0" max="100" value="0" step="0.5" class="audio-seek" aria-label="Progression de la lecture audio" />
+          <span id="audio-duration" class="audio-time">--:--</span>
+        </div>
+        <div id="audio-status-line" class="audio-status-line">Appuyez sur le bouton triangulaire ▶ pour lancer le récit</div>
+        <audio id="audio-element" preload="metadata"></audio>
+      </div>
+
+      <!-- Résumé historique & personnalités -->
+      <div class="step-story-box">
+        <div id="step-tags" class="step-tags"></div>
+        <p id="step-summary" class="step-summary"></p>
+        <p id="step-note" class="step-note"></p>
+      </div>
+
+      <!-- Navigation vers l'étape précédente / Home / suivante -->
+      <div class="step-nav-footer">
+        <button id="btn-prev-step" class="nav-step-btn nav-prev">← Précédente</button>
+        <button class="nav-home-btn btn-home-any" title="Retour à l'accueil" aria-label="Retour à l'accueil">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 3.2L3 10.6V20a1 1 0 0 0 1 1h5.5v-6h5v6H20a1 1 0 0 0 1-1v-9.4L12 3.2z"/></svg>
+        </button>
+        <button id="btn-next-step" class="nav-step-btn nav-next">Étape suivante →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tiroir latéral : Liste complète des étapes & progression -->
+  <div id="list-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Liste des étapes">
+    <div class="modal-drawer">
+      <div class="modal-header">
+        <div>
+          <h3 id="list-modal-title">Étapes du parcours</h3>
+          <p id="progress-summary" class="modal-subtitle">0 / 13 étapes visitées</p>
+        </div>
+        <div class="modal-header-btns">
+          <button class="icon-btn btn-home-any" title="Retour à l'accueil" aria-label="Retour à l'accueil">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></svg>
+          </button>
+          <button id="btn-close-list" class="icon-btn" aria-label="Fermer">✕</button>
+        </div>
+      </div>
+      <div class="progress-bar-track">
+        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+      </div>
+      <div id="steps-list-container" class="steps-list-container"></div>
+      <div class="modal-footer">
+        <button id="btn-open-end-from-list" class="btn-text-primary">JLDApps 2026</button>
+        <button id="btn-reset-progress" class="btn-text-danger">Réinitialiser ma progression</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       PAGE DE FIN — JLDApps 2026
+       ==================================================================== -->
+  <section id="end-screen" class="end-screen hidden" role="dialog" aria-modal="true" aria-label="Fin du parcours">
+    <div class="end-card">
+      <button class="end-home-fab btn-home-any" title="Retour à l'accueil" aria-label="Retour à l'accueil">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></svg>
+      </button>
+      <span id="end-tag" class="end-tag">Parcours accompli</span>
+      <h2 id="end-title" class="end-title">Merci pour votre visite à Sanary-sur-Mer</h2>
+      <p id="end-text" class="end-text">
+        Vous avez parcouru la mémoire de la « capitale mondiale de l’exil artistique et littéraire » (1933–1940).
+      </p>
+
+      <div id="end-portraits-strip" class="end-portraits-strip" aria-hidden="true"></div>
+      <div id="end-stats" class="end-stats-pill">13 / 13 étapes écoutées</div>
+
+      <!-- Génrique de fin 3D sur spirale verticale (Origine photos, musique, sources textes) -->
+      <div class="spiral-credits-viewport" aria-label="Génrique de fin 3D">
+        <div class="spiral-axis-glow" aria-hidden="true"></div>
+        <div id="spiral-credits-stage" class="spiral-credits-stage"></div>
+        <button id="btn-spiral-toggle" class="spiral-pause-btn" title="Pause / Lecture du génrique" aria-label="Pause ou lecture du génrique">⏸</button>
+      </div>
+
+      <div class="end-signature-box">
+        <div class="end-signature-brand">JLDApps 2026</div>
+        <div id="end-signature-sub" class="end-signature-sub">Audioguide GPS • Sanary-sur-Mer</div>
+      </div>
+
+      <div class="end-actions">
+        <button id="btn-end-back-map" class="nav-step-btn nav-prev">Retour à la carte</button>
+        <button id="btn-end-restart" class="nav-step-btn nav-next">Retour à l'accueil</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Menu déroulant haut de gamme des langues (accessible depuis l'accueil et la carte) -->
+  <div id="lang-menu-overlay" class="lang-menu-overlay hidden" role="dialog" aria-modal="true" aria-label="Sélection de la langue">
+    <div class="lang-menu-sheet">
+      <div class="lang-menu-header">
+        <div class="lang-menu-header-text">
+          <span class="lang-menu-eyebrow">AUDIOGUIDE MULTILINGUE</span>
+          <span id="lang-menu-title" class="lang-menu-main-title">Choisissez votre langue</span>
+        </div>
+        <button id="btn-close-lang-menu" class="lang-menu-close" aria-label="Fermer">✕</button>
+      </div>
+      <div id="lang-menu-list" class="lang-menu-list" role="listbox"></div>
+    </div>
+  </div>
+
+  <!-- Visionneuse Photo plein écran (Lightbox) -->
+  <div id="photo-lightbox" class="lightbox hidden" role="dialog" aria-modal="true" aria-label="Photo agrandie">
+    <button class="lightbox-home btn-home-any" title="Retour à l'accueil" aria-label="Retour à l'accueil">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></svg>
+    </button>
+    <button id="btn-close-lightbox" class="lightbox-close" aria-label="Fermer la photo">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+    <p id="lightbox-caption"></p>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="data/etapes.js?v=11"></script>
+  <script src="data/i18n.js?v=8"></script>
+  <script src="data/i18n_steps.js?v=5"></script>
+  <script src="app.js?v=16"></script>
+</body>
+</html>

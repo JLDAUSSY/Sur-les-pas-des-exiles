@@ -1,0 +1,19 @@
+{
+  "name": "Sur les pas des exilés — Sanary-sur-Mer",
+  "short_name": "Exilés Sanary",
+  "description": "Audioguide GPS et parcours de mémoire à Sanary-sur-Mer (1933–1940), capitale mondiale de l'exil artistique et littéraire.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf7f2",
+  "theme_color": "#1a4b6e",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "images/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
