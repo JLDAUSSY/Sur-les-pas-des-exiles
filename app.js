@@ -142,6 +142,7 @@
     stepSheet: document.getElementById('step-sheet'),
     sheetToggleBar: document.getElementById('sheet-toggle-bar'),
     sheetToggleHint: document.getElementById('sheet-toggle-hint'),
+    stepHero: document.getElementById('step-hero'),
     stepSectorPill: document.getElementById('step-sector-pill'),
     stepVisitedPill: document.getElementById('step-visited-pill'),
     stepTitle: document.getElementById('step-title'),
@@ -920,8 +921,19 @@
     el.stepTitle.textContent = target.titre;
     el.stepLocation.textContent = `📍 ${target.lieu}`;
 
+    el.stepImage.onload = () => {
+      if (!el.stepHero) return;
+      const isPortrait = el.stepImage.naturalHeight > el.stepImage.naturalWidth * 1.05;
+      el.stepHero.classList.toggle('is-portrait', isPortrait);
+      el.stepHero.classList.toggle('is-landscape', !isPortrait);
+    };
     el.stepImage.src = target.image;
     el.stepImage.alt = target.titre;
+    if (el.stepImage.complete && el.stepImage.naturalWidth > 0 && el.stepHero) {
+      const isPortrait = el.stepImage.naturalHeight > el.stepImage.naturalWidth * 1.05;
+      el.stepHero.classList.toggle('is-portrait', isPortrait);
+      el.stepHero.classList.toggle('is-landscape', !isPortrait);
+    }
     el.stepImageCredit.textContent = target.imageCredit || target.lieu;
 
     el.stepTags.innerHTML = '';
