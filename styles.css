@@ -2338,3 +2338,75 @@ html, body {
   color: rgba(246, 227, 186, 0.55);
   margin-top: -2px;
 }
+
+
+/* ==========================================================================
+   MISE EN PAGE ADAPTATIVE PORTRAIT vs PAYSAGE DES PHOTOS D'ÉTAPE
+   ========================================================================== */
+.step-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Mode PAYSAGE (Étapes 1, 4, 5, 6) : photo pleine largeur respectant le ratio 16:10 */
+.step-hero.is-landscape .step-photo-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  max-height: 220px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Mode PORTRAIT (Étapes 2, 3, 7, 8, 9, 10, 11, 12, 13) : photo 3:4 entière à gauche + titre/lieu à droite */
+.step-hero.is-portrait {
+  flex-direction: row-reverse;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.step-hero.is-portrait .step-photo-card {
+  width: 132px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.step-hero.is-portrait .step-photo-card img {
+  width: 100%;
+  height: 174px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center 15%;
+}
+
+.step-hero.is-portrait .step-photo-credit {
+  display: none;
+}
+
+.step-hero.is-portrait .step-header-row {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  gap: 6px;
+}
+
+.step-hero.is-portrait .step-location {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.35;
+}
+
+@media (min-width: 900px) {
+  .step-hero.is-portrait .step-photo-card {
+    width: 150px;
+  }
+  .step-hero.is-portrait .step-photo-card img {
+    height: 198px;
+  }
+}
