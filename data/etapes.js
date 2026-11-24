@@ -18,7 +18,7 @@ window.PARCOURS_ETAPES = [
       "Les 68 exilés",
       "Romain Gary"
     ],
-    "resume": "Une grande plaque commémorative recense les noms des 68 écrivains, peintres, musiciens et penseurs ayant trouvé refuge à Sanary après l'arrivée d'Hitler au pouvoir en 1933. À proximité se trouvent également le pupitre et le chêne dédiés à Romain Gary (né Roman Kacew à Vilnius en 1914), résistant, Compagnon de la Libération et romancier humaniste.",
+    "resume": "Une grande plaque commémorative recense les noms des 68 écrivains, peintres, musiciens et penseurs ayant trouvé refuge à Sanary après l'arrivée d'Hitler au pouvoir en 1933. Cette communauté cosmopolite réunissait des personnalités juives fuyant les persécutions antisémites, des opposants politiques et intellectuels non juifs refusant la dictature nazie, ainsi que des artistes et écrivains étrangers sympathisants. À proximité se trouvent également le pupitre et le chêne dédiés à Romain Gary (né Roman Kacew à Vilnius en 1914), résistant, Compagnon de la Libération et romancier humaniste.",
     "notePratique": "Point de départ et d'arrivée des deux boucles (courte 3 km et complète 8 km)."
   },
   {
