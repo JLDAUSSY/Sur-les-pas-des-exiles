@@ -541,14 +541,14 @@ html, body {
   border-top-right-radius: var(--radius-lg);
   border-top: 1px solid var(--border-stone);
   box-shadow: 0 -8px 28px rgba(17, 53, 79, 0.18);
-  max-height: 62vh;
+  max-height: 68vh;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.3s ease;
 }
 
 .step-sheet.collapsed {
-  transform: translateY(calc(100% - 44px));
+  transform: translateY(calc(100% - 38px));
 }
 
 .sheet-handle-bar {
@@ -557,24 +557,24 @@ html, body {
   border-top-left-radius: var(--radius-lg);
   border-top-right-radius: var(--radius-lg);
   border-bottom: 1px solid var(--border-stone);
-  padding: 8px 16px 7px;
+  padding: 6px 14px 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .sheet-handle-pill {
-  width: 44px;
+  width: 40px;
   height: 4px;
   border-radius: 99px;
   background: #cbbba3;
 }
 
 .sheet-toggle-hint {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--ink-muted);
   text-transform: uppercase;
@@ -583,75 +583,80 @@ html, body {
 
 .sheet-content {
   overflow-y: auto;
-  padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   -webkit-overflow-scrolling: touch;
 }
 
 .step-header-row {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  flex-shrink: 0;
 }
 
 .step-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .sector-pill {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--med-blue);
   background: var(--med-blue-light);
-  padding: 3px 9px;
+  padding: 2px 8px;
   border-radius: 999px;
 }
 
 .visited-pill {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--olive);
   background: var(--olive-light);
-  padding: 3px 9px;
+  padding: 2px 8px;
   border-radius: 999px;
 }
 
 .step-title {
   font-family: var(--font-serif);
-  font-size: 1.24rem;
+  font-size: 1.08rem;
   font-weight: 700;
   color: var(--med-blue-dark);
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .step-location {
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   color: var(--ink-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Photo de l'étape */
+/* Photo de l'étape — généreuse et jamais écrasée */
 .step-photo-card {
   position: relative;
+  flex-shrink: 0;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--border-stone);
-  background: #ebe2d3;
+  background: #1b2a38;
   box-shadow: var(--shadow-sm);
 }
 
 .step-photo-card img {
   display: block;
   width: 100%;
-  height: 190px;
+  height: 235px;
   object-fit: cover;
-  object-position: center 22%;
+  object-position: center 15%;
   cursor: pointer;
 }
 
@@ -659,62 +664,66 @@ html, body {
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   border: none;
   background: rgba(17, 53, 79, 0.72);
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   display: grid;
   place-items: center;
 }
 
 .step-photo-credit {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--ink-secondary);
   background: var(--bg-card);
-  padding: 6px 10px;
+  padding: 4px 10px;
   border-top: 1px solid var(--border-stone);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ---------- Lecteur Audio MP3 (Bouton triangulaire + Pause + Replay) ---------- */
+/* ---------- Lecteur Audio MP3 compact (Bouton triangulaire + Pause + Replay) ---------- */
 .audio-player-box {
+  flex-shrink: 0;
   background: var(--bg-card);
   border: 1.5px solid var(--border-stone);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 10px 12px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 8px;
 }
 
 .audio-controls-row {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 1.45fr 1fr 1fr;
+  gap: 8px;
   align-items: stretch;
 }
 
 /* Bouton triangulaire proéminent pour démarrer l'histoire */
 .btn-play-triangle {
   border: none;
-  border-radius: 14px;
+  border-radius: 12px;
   background: linear-gradient(135deg, var(--ochre) 0%, var(--ochre-dark) 100%);
   color: #ffffff;
-  padding: 10px 12px;
-  min-height: 58px;
+  padding: 8px 10px;
+  min-height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 0.96rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(184, 93, 59, 0.34);
+  box-shadow: 0 3px 10px rgba(184, 93, 59, 0.34);
   transition: transform 0.14s ease, box-shadow 0.2s ease;
 }
 
@@ -724,32 +733,37 @@ html, body {
 
 .btn-play-triangle.is-playing {
   background: linear-gradient(135deg, var(--olive) 0%, #2c6244 100%);
-  box-shadow: 0 4px 14px rgba(59, 122, 87, 0.36);
+  box-shadow: 0 3px 12px rgba(59, 122, 87, 0.36);
 }
 
 .triangle-svg {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 
 .btn-audio-secondary {
   border: 1.5px solid var(--border-stone);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--bg-sand);
   color: var(--med-blue-dark);
-  padding: 8px 10px;
-  min-height: 58px;
+  padding: 6px 8px;
+  min-height: 46px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 5px;
   cursor: pointer;
   font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 700;
   transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-audio-secondary svg {
+  width: 17px;
+  height: 17px;
 }
 
 .btn-audio-secondary:hover:not(:disabled) {
@@ -765,28 +779,26 @@ html, body {
 .audio-progress-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .audio-time {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--ink-secondary);
-  min-width: 36px;
+  min-width: 34px;
 }
 
 .audio-seek {
   flex: 1;
   accent-color: var(--ochre);
-  height: 6px;
+  height: 5px;
   cursor: pointer;
 }
 
 .audio-status-line {
-  font-size: 0.78rem;
-  color: var(--ink-muted);
-  text-align: center;
+  display: none;
 }
 
 /* ---------- Texte & tags ---------- */
