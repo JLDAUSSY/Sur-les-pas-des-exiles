@@ -13,8 +13,11 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v33';
+  const AUDIO_VER = 'v34';
   const SANARY_RADIUS_M = 8000; // 8 km autour du départ (Office de Tourisme de Sanary)
+  const GPS_MIN_DIST_M = 6; // Économie batterie RandoTracker : ignore micro-dérives < 6 m
+  const GPS_MIN_INTERVAL_MS = 5000; // Cadence adaptative marche (5 s)
+  const GPS_IDLE_INTERVAL_MS = 40000; // Heartbeat adaptatif à l'arrêt (40 s, techno RandoTracker)
   const RETURN_STEP_ID = 99;
 
   const FLAG_SVGS = {
@@ -751,20 +754,37 @@
     map.fitBounds(bounds, { padding: [45, 45], maxZoom: 16 });
   }
 
-  // ---------- Moteur GPS Continu résilient (technologie RandoTracker) ----------
-  function startGpsWatch(highAccuracy = true) {
-    if (!('geolocation' in navigator)) {
-      setGpsStatus('gps-err', t('gpsUnavailable'));
-      return;
-    }
+  let lastGpsAccept = { lat: null, lon: null, ts: 0 };
 
+  function stopGpsWatch() {
     if (state.gpsWatchId !== null) {
       try {
         navigator.geolocation.clearWatch(state.gpsWatchId);
       } catch (_) {}
       state.gpsWatchId = null;
     }
+  }
 
+  function releaseWakeLock() {
+    if (state.wakeLock) {
+      try {
+        state.wakeLock.release();
+      } catch (_) {}
+      state.wakeLock = null;
+    }
+  }
+
+  // ---------- Moteur GPS Continu résilient & économe (technologie RandoTracker) ----------
+  function startGpsWatch(highAccuracy = true) {
+    if (!('geolocation' in navigator)) {
+      setGpsStatus('gps-err', t('gpsUnavailable'));
+      return;
+    }
+
+    // En mode Parcours libre, privilégie le mode hybride basse conso (économie ~60% batterie GPS)
+    const useHighAcc = highAccuracy && state.mode === 'guided';
+
+    stopGpsWatch();
     setGpsStatus('', t('gpsSearching'));
 
     // 1. Premier accrochage rapide (Wi-Fi / réseau / dernier fix connu — fonctionne aussi en intérieur)
@@ -783,16 +803,23 @@
       { enableHighAccuracy: false, maximumAge: 60000, timeout: 8000 }
     );
 
-    // 2. Suivi continu haute précision avec repli automatique si signal satellite faible en intérieur
+    // 2. Suivi continu avec Duty-Cycling RandoTracker + repli hybride automatique en intérieur
     state.gpsWatchId = navigator.geolocation.watchPosition(
       (pos) => {
         if (state.simMode) return;
-        onNewPosition(
-          pos.coords.latitude,
-          pos.coords.longitude,
-          pos.coords.accuracy || 15,
-          pos.coords.heading
-        );
+        const now = Date.now();
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const speedKmh = pos.coords.speed != null && pos.coords.speed >= 0 ? pos.coords.speed * 3.6 : null;
+        if (lastGpsAccept.lat !== null) {
+          const moved = haversineMeters(lastGpsAccept.lat, lastGpsAccept.lon, lat, lon);
+          const minDelay = speedKmh !== null && speedKmh < 0.8 ? GPS_IDLE_INTERVAL_MS : GPS_MIN_INTERVAL_MS;
+          if (moved < GPS_MIN_DIST_M && now - lastGpsAccept.ts < minDelay) {
+            return; // Ignore les micro-ticks immobiles pour préserver CPU & batterie
+          }
+        }
+        lastGpsAccept = { lat, lon, ts: now };
+        onNewPosition(lat, lon, pos.coords.accuracy || 15, pos.coords.heading);
         setGpsStatus('gps-ok', `${t('gpsActive')} (±${Math.round(pos.coords.accuracy || 10)} m)`);
       },
       (err) => {
@@ -801,16 +828,15 @@
           setGpsStatus('gps-err', t('gpsAllow'));
           return;
         }
-        // Si le mode satellite pur expire (en intérieur), bascule automatiquement sur localisation réseau/hybride
-        if (highAccuracy) {
+        if (useHighAcc) {
           startGpsWatch(false);
         } else if (!state.userPos) {
           setGpsStatus('gps-err', t('gpsWeak'));
         }
       },
       {
-        enableHighAccuracy: highAccuracy,
-        maximumAge: highAccuracy ? 5000 : 15000,
+        enableHighAccuracy: useHighAcc,
+        maximumAge: useHighAcc ? 8000 : 25000,
         timeout: 30000
       }
     );
@@ -1459,6 +1485,8 @@
       });
 
     el.endScreen.classList.remove('hidden');
+    stopGpsWatch();
+    releaseWakeLock();
     initSpiralCredits();
     startOutroMusic();
   }
@@ -1481,6 +1509,10 @@
     state.currentStepId = 1;
     selectStep(1, { openSheet: true, panToStep: false });
     saveState();
+
+    // Économie batterie RandoTracker : coupe le GPS continu et relâche le WakeLock sur l'écran d'accueil
+    stopGpsWatch();
+    releaseWakeLock();
 
     // Repart toujours du tout début de l'application (Acte 1 : portraits + titre + Peer Gynt -> Menu langues)
     renderWelcomePortraits();
@@ -1620,12 +1652,14 @@
         }, 80);
       }
       if (state.mode === 'guided' && !state.simMode) {
+        requestWakeLock();
         if (state.userPos) {
           checkGuidedSanaryPresence(true);
-        } else {
-          // Si le GPS n'a pas encore répondu, on relance un accrochage ; s'il reste hors Sanary, la modale s'affichera dès le fix
-          startGpsWatch(true);
         }
+        startGpsWatch(true);
+      } else if (!state.simMode) {
+        // En Parcours libre : GPS hybride basse consommation uniquement
+        startGpsWatch(false);
       }
     });
 
@@ -1748,8 +1782,19 @@
     });
 
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        requestWakeLock();
+      if (document.visibilityState === 'hidden') {
+        // Économie batterie RandoTracker : relâche l'écran et suspend le GPS continu en arrière-plan
+        releaseWakeLock();
+        if (state.mode === 'free' || !el.welcomeScreen.classList.contains('hidden')) {
+          stopGpsWatch();
+        }
+      } else if (document.visibilityState === 'visible') {
+        if (el.welcomeScreen.classList.contains('hidden')) {
+          requestWakeLock();
+          if (!state.simMode && state.gpsWatchId === null) {
+            startGpsWatch(state.mode === 'guided');
+          }
+        }
       }
     });
   }
@@ -1785,8 +1830,7 @@
     initAudioEvents();
     initUIEvents();
     selectStep(state.currentStepId, { openSheet: true, panToStep: false });
-    startGpsWatch();
-    requestWakeLock();
+    // Économie batterie RandoTracker : ne démarre pas le GPS haute précision tant que l'écran d'accueil est affiché
     registerServiceWorker();
     startIntroSplashSequence();
   }
