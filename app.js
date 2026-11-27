@@ -13,7 +13,8 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v30';
+  const AUDIO_VER = 'v31';
+  const SANARY_RADIUS_M = 8000; // 8 km autour du départ (Office de Tourisme de Sanary)
   const RETURN_STEP_ID = 99;
 
   const FLAG_SVGS = {
@@ -49,6 +50,7 @@
   // ---------- État global ----------
   const state = {
     lang: 'fr', // 'fr' | 'en' | 'de' | 'nl' | 'es' | 'it'
+    mode: 'guided', // 'free' | 'guided'
     loop: 'full', // 'short' (1..6) | 'full' (1..13)
     currentStepId: 1,
     visitedIds: new Set(),
@@ -59,8 +61,11 @@
     gpsWatchId: null,
     simMode: false,
     wakeLock: null,
-    sheetCollapsed: false
+    sheetCollapsed: false,
+    guidedModalShown: false
   };
+
+  let navRouteState = { targetId: null, fromLat: null, fromLon: null, coords: null, dist: null, fetching: false };
 
   let map = null;
   let tileLayer = null;
@@ -89,6 +94,19 @@
     langMenuTitle: document.getElementById('lang-menu-title'),
     langMenuList: document.getElementById('lang-menu-list'),
     btnCloseLangMenu: document.getElementById('btn-close-lang-menu'),
+    welcomeChooseMode: document.getElementById('welcome-choose-mode'),
+    welcomeModeFree: document.getElementById('welcome-mode-free'),
+    welcomeModeGuided: document.getElementById('welcome-mode-guided'),
+    welcomeModeFreeTitle: document.getElementById('welcome-mode-free-title'),
+    welcomeModeFreeDesc: document.getElementById('welcome-mode-free-desc'),
+    welcomeModeGuidedTitle: document.getElementById('welcome-mode-guided-title'),
+    welcomeModeGuidedDesc: document.getElementById('welcome-mode-guided-desc'),
+    guidedLocModal: document.getElementById('guided-location-modal'),
+    guidedLocTitle: document.getElementById('guided-loc-title'),
+    guidedLocMsg: document.getElementById('guided-loc-msg'),
+    btnGuidedSwitchFree: document.getElementById('btn-guided-switch-free'),
+    btnGuidedTryDemo: document.getElementById('btn-guided-try-demo'),
+    btnGuidedRetryGps: document.getElementById('btn-guided-retry-gps'),
     welcomeChooseLoop: document.getElementById('welcome-choose-loop'),
     welcomeLoopShort: document.getElementById('welcome-loop-short'),
     welcomeLoopFull: document.getElementById('welcome-loop-full'),
@@ -269,6 +287,15 @@
     el.welcomeTitle.textContent = t('appTitle');
     el.welcomeSubtitle.textContent = t('appSubtitle');
     el.welcomeChooseLang.textContent = t('chooseLang');
+    if (el.welcomeChooseMode) el.welcomeChooseMode.textContent = t('chooseMode');
+    if (el.welcomeModeFreeTitle) el.welcomeModeFreeTitle.textContent = `🧭 ${t('modeFreeTitle')}`;
+    if (el.welcomeModeFreeDesc) el.welcomeModeFreeDesc.textContent = t('modeFreeDesc');
+    if (el.welcomeModeGuidedTitle) el.welcomeModeGuidedTitle.textContent = `🚶 ${t('modeGuidedTitle')}`;
+    if (el.welcomeModeGuidedDesc) el.welcomeModeGuidedDesc.textContent = t('modeGuidedDesc');
+    if (el.guidedLocTitle) el.guidedLocTitle.textContent = t('goToSanaryTitle');
+    if (el.btnGuidedSwitchFree) el.btnGuidedSwitchFree.textContent = `🧭 ${t('switchToFreeBtn')}`;
+    if (el.btnGuidedTryDemo) el.btnGuidedTryDemo.textContent = `🎬 ${t('tryDemoBtn')}`;
+    if (el.btnGuidedRetryGps) el.btnGuidedRetryGps.textContent = `↻ ${t('retryGpsBtn')}`;
     el.welcomeChooseLoop.textContent = t('chooseLoop');
     el.welcomeLoopShortTitle.textContent = t('loopShortTitle');
     el.welcomeLoopShortDesc.textContent = t('loopShortDesc');
@@ -455,6 +482,7 @@
 
   function getActiveSteps() {
     const base = state.loop === 'short' ? ALL_STEPS.filter((s) => s.boucleCourte) : ALL_STEPS;
+    if (state.mode === 'free') return [...base];
     return [...base, getReturnStep()];
   }
 
@@ -510,6 +538,7 @@
         STORAGE_KEY,
         JSON.stringify({
           lang: state.lang,
+          mode: state.mode,
           loop: state.loop,
           currentStepId: state.currentStepId,
           visitedIds: Array.from(state.visitedIds),
@@ -525,6 +554,7 @@
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (saved.lang && UI_DICT[saved.lang]) state.lang = saved.lang;
+      if (saved.mode === 'free' || saved.mode === 'guided') state.mode = saved.mode;
       if (saved.loop === 'short' || saved.loop === 'full') state.loop = saved.loop;
       if (Number.isInteger(saved.currentStepId) && saved.currentStepId !== RETURN_STEP_ID) {
         state.currentStepId = saved.currentStepId;
@@ -607,26 +637,31 @@
     stepMarkers.clear();
 
     const allCoords = [];
-    for (let i = 0; i < storySteps.length - 1; i++) {
-      const seg = SEGMENTS[`${storySteps[i].id}-${storySteps[i + 1].id}`];
-      if (seg && seg.coords) allCoords.push(seg.coords);
-    }
-    routeBgLayer = L.polyline(allCoords, {
-      color: '#1a4b6e',
-      weight: 4.5,
-      opacity: 0.72,
-      lineJoin: 'round'
-    }).addTo(map);
-
-    // Segment de retour en boucle vers le point de départ (Office de Tourisme)
-    const retKey = state.loop === 'short' ? '6-1' : '13-1';
-    if (SEGMENTS[retKey] && SEGMENTS[retKey].coords) {
-      returnLoopLayer = L.polyline(SEGMENTS[retKey].coords, {
-        color: '#3b7a57',
-        weight: 4,
-        opacity: 0.82,
-        dashArray: '8 7'
+    // En Parcours dirigé uniquement : affiche le tracé d'itinéraire complet + retour en boucle
+    // En Parcours libre : aucun itinéraire affiché, uniquement les marqueurs à explorer librement
+    if (state.mode === 'guided') {
+      const allCoords = [];
+      for (let i = 0; i < storySteps.length - 1; i++) {
+        const seg = SEGMENTS[`${storySteps[i].id}-${storySteps[i + 1].id}`];
+        if (seg && seg.coords) allCoords.push(seg.coords);
+      }
+      routeBgLayer = L.polyline(allCoords, {
+        color: '#1a4b6e',
+        weight: 4.5,
+        opacity: 0.72,
+        lineJoin: 'round'
       }).addTo(map);
+
+      // Segment de retour en boucle vers le point de départ (Office de Tourisme)
+      const retKey = state.loop === 'short' ? '6-1' : '13-1';
+      if (SEGMENTS[retKey] && SEGMENTS[retKey].coords) {
+        returnLoopLayer = L.polyline(SEGMENTS[retKey].coords, {
+          color: '#3b7a57',
+          weight: 4,
+          opacity: 0.82,
+          dashArray: '8 7'
+        }).addTo(map);
+      }
     }
 
     storySteps.forEach((step) => {
@@ -681,6 +716,7 @@
       map.removeLayer(routeActiveLayer);
       routeActiveLayer = null;
     }
+    if (state.mode === 'free') return;
     const storySteps = getActiveSteps().filter((s) => !s.isReturn);
     let segKey = null;
 
@@ -817,23 +853,140 @@
 
     updateLiveGuidance();
     checkProximityGeofencing();
+    checkGuidedSanaryPresence(false);
+  }
+
+  function isUserInSanary() {
+    if (state.simMode) return true;
+    if (!state.userPos) return false;
+    const start = ALL_STEPS[0];
+    return haversineMeters(state.userPos.lat, state.userPos.lon, start.lat, start.lon) <= SANARY_RADIUS_M;
+  }
+
+  function checkGuidedSanaryPresence(forceShow = false) {
+    if (state.mode !== 'guided' || state.simMode) {
+      if (el.guidedLocModal) el.guidedLocModal.classList.add('hidden');
+      return true;
+    }
+    if (!el.welcomeScreen.classList.contains('hidden') && !forceShow) return true;
+
+    const start = ALL_STEPS[0];
+    if (!state.userPos) {
+      if (forceShow && el.guidedLocModal) {
+        el.guidedLocMsg.textContent = t('goToSanaryNoGps');
+        el.guidedLocModal.classList.remove('hidden');
+      }
+      return false;
+    }
+
+    const distToSanary = haversineMeters(state.userPos.lat, state.userPos.lon, start.lat, start.lon);
+    if (distToSanary > SANARY_RADIUS_M) {
+      if (forceShow || !state.guidedModalShown) {
+        state.guidedModalShown = true;
+        if (el.guidedLocModal) {
+          el.guidedLocMsg.textContent = t('goToSanaryMsg', { dist: formatDistance(distToSanary) });
+          el.guidedLocModal.classList.remove('hidden');
+        }
+      }
+      return false;
+    }
+
+    if (el.guidedLocModal) el.guidedLocModal.classList.add('hidden');
+    return true;
+  }
+
+  function drawGuidedPedestrianLine(coords) {
+    if (liveGuideLine) {
+      map.removeLayer(liveGuideLine);
+      liveGuideLine = null;
+    }
+    if (!coords || coords.length < 2) return;
+    liveGuideLine = L.polyline(coords, {
+      color: '#0d9488',
+      weight: 5,
+      opacity: 0.9,
+      dashArray: '10 7',
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+  }
+
+  function requestPedestrianNavRoute(target) {
+    if (!state.userPos || state.mode !== 'guided') return;
+    if (!isUserInSanary()) return;
+
+    const movedEnough =
+      navRouteState.fromLat === null ||
+      haversineMeters(state.userPos.lat, state.userPos.lon, navRouteState.fromLat, navRouteState.fromLon) > 25;
+
+    if (navRouteState.targetId === target.id && !movedEnough && navRouteState.coords) {
+      drawGuidedPedestrianLine(navRouteState.coords);
+      if (navRouteState.dist != null) {
+        el.guidanceDistance.textContent = formatDistance(navRouteState.dist);
+        el.guidanceEta.textContent = formatEta(navRouteState.dist);
+      }
+      return;
+    }
+
+    // Affichage immédiat en ligne directe pendant le calcul du tracé piéton OSRM
+    drawGuidedPedestrianLine([
+      [state.userPos.lat, state.userPos.lon],
+      [target.lat, target.lon]
+    ]);
+
+    if (navRouteState.fetching) return;
+    navRouteState.fetching = true;
+    const reqTargetId = target.id;
+    const fromLat = state.userPos.lat;
+    const fromLon = state.userPos.lon;
+
+    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${fromLon.toFixed(6)},${fromLat.toFixed(6)};${target.lon.toFixed(6)},${target.lat.toFixed(6)}?overview=full&geometries=geojson`;
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        navRouteState.fetching = false;
+        if (state.mode !== 'guided' || state.currentStepId !== reqTargetId) return;
+        const route = data && data.routes && data.routes[0];
+        if (!route || !route.geometry || !route.geometry.coordinates) return;
+        const coords = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+        navRouteState = {
+          targetId: reqTargetId,
+          fromLat,
+          fromLon,
+          coords,
+          dist: route.distance,
+          fetching: false
+        };
+        drawGuidedPedestrianLine(coords);
+        if (route.distance != null) {
+          el.guidanceDistance.textContent = formatDistance(route.distance);
+          el.guidanceEta.textContent = formatEta(route.distance);
+        }
+      })
+      .catch(() => {
+        navRouteState.fetching = false;
+      });
   }
 
   function updateLiveGuidance() {
     const rawTarget = getStepById(state.currentStepId);
     const target = getLocalizedStep(rawTarget);
-    const badgeLabel = target.isReturn ? '↺' : String(target.id);
+    const badgeLabel = target.isReturn ? '↺' : (target.badge || String(target.id));
     el.guidanceBadge.textContent = badgeLabel;
     el.guidanceTitle.textContent = target.titre;
 
     if (!state.userPos) {
       el.guidanceLabel.textContent = target.isReturn
         ? t('returnTitle')
-        : `${t('selectedStep')} ${target.id}`;
+        : `${t('selectedStep')} ${badgeLabel}`;
       el.guidanceLabel.classList.remove('arrived');
       el.guidanceBadge.classList.remove('arrived');
       el.guidanceDistance.textContent = '-- m';
       el.guidanceEta.textContent = t('waitingGps');
+      if (liveGuideLine) {
+        map.removeLayer(liveGuideLine);
+        liveGuideLine = null;
+      }
       return;
     }
 
@@ -849,29 +1002,23 @@
     el.guidanceLabel.classList.toggle('arrived', arrived);
     if (target.isReturn) {
       el.guidanceLabel.textContent = arrived ? `${t('returnTitle')} ✓` : t('returnTitle');
+    } else if (state.mode === 'guided' && !arrived && isUserInSanary()) {
+      el.guidanceLabel.textContent =
+        target.id === 1 ? t('guidedToStart') : `${t('guidedToStep')} ${badgeLabel}`;
     } else {
       el.guidanceLabel.textContent = arrived
-        ? `${t('youAreAt')} ${target.id} !`
-        : `${t('capTowards')} ${target.id}`;
+        ? `${t('youAreAt')} ${badgeLabel} !`
+        : `${t('capTowards')} ${badgeLabel}`;
     }
 
     if (liveGuideLine) {
       map.removeLayer(liveGuideLine);
       liveGuideLine = null;
     }
-    if (!arrived) {
-      liveGuideLine = L.polyline(
-        [
-          [state.userPos.lat, state.userPos.lon],
-          [target.lat, target.lon]
-        ],
-        {
-          color: '#b85d3b',
-          weight: 2.5,
-          opacity: 0.65,
-          dashArray: '5 8'
-        }
-      ).addTo(map);
+
+    // En mode libre : pas de tracé d'itinéraire ; en mode dirigé (à Sanary) : navigation piétonne réelle
+    if (!arrived && state.mode === 'guided' && isUserInSanary()) {
+      requestPedestrianNavRoute(target);
     }
   }
 
@@ -885,6 +1032,9 @@
       triggerArrival(getLocalizedStep(target));
       return;
     }
+
+    // En Parcours dirigé, on suit strictement l'ordre des étapes (pas de saut intempestif)
+    if (state.mode === 'guided') return;
 
     for (const s of steps) {
       if (s.id === target.id || state.notifiedArrivalIds.has(s.id)) continue;
@@ -1316,6 +1466,8 @@
     el.listModal.classList.add('hidden');
     el.photoLightbox.classList.add('hidden');
     if (el.langMenuOverlay) el.langMenuOverlay.classList.add('hidden');
+    if (el.guidedLocModal) el.guidedLocModal.classList.add('hidden');
+    state.guidedModalShown = false;
 
     // Réinitialise toujours le parcours au tout début (Étape 1)
     state.currentStepId = 1;
@@ -1382,6 +1534,53 @@
       });
     }
 
+    function setWalkMode(mode, refreshMap = true) {
+      state.mode = mode === 'free' ? 'free' : 'guided';
+      state.guidedModalShown = false;
+      navRouteState = { targetId: null, fromLat: null, fromLon: null, coords: null, dist: null, fetching: false };
+      if (el.welcomeModeFree) el.welcomeModeFree.classList.toggle('active', state.mode === 'free');
+      if (el.welcomeModeGuided) el.welcomeModeGuided.classList.toggle('active', state.mode === 'guided');
+      if (state.mode === 'free' && el.guidedLocModal) el.guidedLocModal.classList.add('hidden');
+      const steps = getActiveSteps();
+      if (!steps.some((s) => s.id === state.currentStepId)) {
+        state.currentStepId = steps[0].id;
+      }
+      if (refreshMap && map) {
+        if (liveGuideLine) {
+          map.removeLayer(liveGuideLine);
+          liveGuideLine = null;
+        }
+        renderRouteAndMarkers();
+        selectStep(state.currentStepId, { openSheet: false, panToStep: false });
+        updateLiveGuidance();
+      }
+      saveState();
+    }
+
+    if (el.welcomeModeFree) el.welcomeModeFree.addEventListener('click', () => setWalkMode('free', true));
+    if (el.welcomeModeGuided) el.welcomeModeGuided.addEventListener('click', () => setWalkMode('guided', true));
+
+    if (el.btnGuidedSwitchFree) {
+      el.btnGuidedSwitchFree.addEventListener('click', () => {
+        el.guidedLocModal.classList.add('hidden');
+        setWalkMode('free', true);
+        fitMapToRoute();
+      });
+    }
+    if (el.btnGuidedTryDemo) {
+      el.btnGuidedTryDemo.addEventListener('click', () => {
+        el.guidedLocModal.classList.add('hidden');
+        if (!state.simMode) toggleSimMode();
+      });
+    }
+    if (el.btnGuidedRetryGps) {
+      el.btnGuidedRetryGps.addEventListener('click', () => {
+        el.guidedLocModal.classList.add('hidden');
+        state.guidedModalShown = false;
+        startGpsWatch(true);
+      });
+    }
+
     // Boucle sur l'écran d'accueil & dans l'en-tête
     el.welcomeLoopShort.addEventListener('click', () => setLoop('short', false));
     el.welcomeLoopFull.addEventListener('click', () => setLoop('full', false));
@@ -1392,15 +1591,33 @@
     el.btnStartWalk.addEventListener('click', () => {
       stopIntroMusic();
       el.welcomeScreen.classList.add('hidden');
-      if (state.currentStepId === RETURN_STEP_ID) {
+      state.guidedModalShown = false;
+      if (state.mode === 'guided') {
+        state.currentStepId = 1;
+        selectStep(1, { openSheet: true, panToStep: false });
+      } else if (state.currentStepId === RETURN_STEP_ID) {
         selectStep(1, { openSheet: true, panToStep: false });
       }
       if (map) {
+        renderRouteAndMarkers();
+        updateLiveGuidance();
         setTimeout(() => {
           map.invalidateSize();
-          const cur = getStepById(state.currentStepId);
-          map.setView([cur.lat, cur.lon], 16, { animate: true });
+          if (state.mode === 'free') {
+            fitMapToRoute();
+          } else {
+            const cur = getStepById(state.currentStepId);
+            map.setView([cur.lat, cur.lon], 16, { animate: true });
+          }
         }, 80);
+      }
+      if (state.mode === 'guided' && !state.simMode) {
+        if (state.userPos) {
+          checkGuidedSanaryPresence(true);
+        } else {
+          // Si le GPS n'a pas encore répondu, on relance un accrochage ; s'il reste hors Sanary, la modale s'affichera dès le fix
+          startGpsWatch(true);
+        }
       }
     });
 
@@ -1553,6 +1770,8 @@
     el.btnLoopFull.classList.toggle('active', state.loop === 'full');
     el.welcomeLoopShort.classList.toggle('active', state.loop === 'short');
     el.welcomeLoopFull.classList.toggle('active', state.loop === 'full');
+    if (el.welcomeModeFree) el.welcomeModeFree.classList.toggle('active', state.mode === 'free');
+    if (el.welcomeModeGuided) el.welcomeModeGuided.classList.toggle('active', state.mode === 'guided');
 
     initMap();
     initAudioEvents();
