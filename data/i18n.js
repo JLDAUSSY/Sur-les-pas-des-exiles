@@ -89,7 +89,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Dirigé",
     guidedToStart: "Suivez l’itinéraire en pointillés vers le point de départ",
     guidedToStep: "Suivez l’itinéraire en pointillés vers l’Étape",
-    followDashedToStart: "Suivez l’itinéraire en pointillés pour vous rendre au point de départ"
+    followDashedToStart: "Suivez l’itinéraire en pointillés pour vous rendre au point de départ",
     goToSanaryTitle: "Allez à Sanary-sur-Mer",
     goToSanaryMsg: "Allez à Sanary-sur-Mer pour commencer le parcours dirigé. Vous êtes actuellement à {dist} du point de départ.",
     goToSanaryNoGps: "Activez le GPS et rendez-vous à Sanary-sur-Mer pour démarrer le parcours dirigé.",
@@ -182,7 +182,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Guided",
     guidedToStart: "Follow the dashed route to the starting point",
     guidedToStep: "Follow the dashed route to Stop",
-    followDashedToStart: "Follow the dashed route to reach the starting point"
+    followDashedToStart: "Follow the dashed route to reach the starting point",
     goToSanaryTitle: "Go to Sanary-sur-Mer",
     goToSanaryMsg: "Go to Sanary-sur-Mer to start the guided walk. You are currently {dist} from the starting point.",
     goToSanaryNoGps: "Enable GPS and head to Sanary-sur-Mer to start the guided walk.",
@@ -275,7 +275,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Geführt",
     guidedToStart: "Folgen Sie der gestrichelten Route zum Startpunkt",
     guidedToStep: "Folgen Sie der gestrichelten Route zu Station",
-    followDashedToStart: "Folgen Sie der gestrichelten Route, um zum Startpunkt zu gelangen"
+    followDashedToStart: "Folgen Sie der gestrichelten Route, um zum Startpunkt zu gelangen",
     goToSanaryTitle: "Fahren Sie nach Sanary-sur-Mer",
     goToSanaryMsg: "Begeben Sie sich nach Sanary-sur-Mer, um den geführten Rundgang zu starten (aktuell {dist} vom Startpunkt entfernt).",
     goToSanaryNoGps: "Aktivieren Sie GPS und begeben Sie sich nach Sanary-sur-Mer für den geführten Rundgang.",
@@ -368,7 +368,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Begeleid",
     guidedToStart: "Volg de stippellijn naar het startpunt",
     guidedToStep: "Volg de stippellijn naar Etappe",
-    followDashedToStart: "Volg de gestippelde route om naar het startpunt te gaan"
+    followDashedToStart: "Volg de gestippelde route om naar het startpunt te gaan",
     goToSanaryTitle: "Ga naar Sanary-sur-Mer",
     goToSanaryMsg: "Ga naar Sanary-sur-Mer om de begeleide wandeling te starten (u bent momenteel op {dist} van het startpunt).",
     goToSanaryNoGps: "Schakel GPS in en ga naar Sanary-sur-Mer voor de begeleide wandeling.",
@@ -461,7 +461,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Guiado",
     guidedToStart: "Siga el recorrido punteado hacia el punto de partida",
     guidedToStep: "Siga el recorrido punteado hacia la Etapa",
-    followDashedToStart: "Siga el itinerario en línea discontinua para llegar al punto de partida"
+    followDashedToStart: "Siga el itinerario en línea discontinua para llegar al punto de partida",
     goToSanaryTitle: "Vaya a Sanary-sur-Mer",
     goToSanaryMsg: "Vaya a Sanary-sur-Mer para iniciar el recorrido guiado (actualmente está a {dist} del punto de partida).",
     goToSanaryNoGps: "Active el GPS y acuda a Sanary-sur-Mer para iniciar el recorrido guiado.",
@@ -554,7 +554,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Guidato",
     guidedToStart: "Seguite il percorso tratteggiato verso la partenza",
     guidedToStep: "Seguite il percorso tratteggiato verso la Tappa",
-    followDashedToStart: "Seguite l’itinerario tratteggiato per raggiungere il punto di partenza"
+    followDashedToStart: "Seguite l’itinerario tratteggiato per raggiungere il punto di partenza",
     goToSanaryTitle: "Recatevi a Sanary-sur-Mer",
     goToSanaryMsg: "Recatevi a Sanary-sur-Mer per iniziare il percorso guidato (siete attualmente a {dist} dalla partenza).",
     goToSanaryNoGps: "Attivate il GPS e recatevi a Sanary-sur-Mer per avviare il percorso guidato.",
@@ -647,7 +647,7 @@ window.I18N_UI = {
     modeGuidedBadge: "Z nawigacją",
     guidedToStart: "Podążaj przerywaną trasą do punktu startowego",
     guidedToStep: "Podążaj przerywaną trasą do Etapu",
-    followDashedToStart: "Podążaj przerywaną trasą, aby dotrzeć do punktu startowego"
+    followDashedToStart: "Podążaj przerywaną trasą, aby dotrzeć do punktu startowego",
     goToSanaryTitle: "Udaj się do Sanary-sur-Mer",
     goToSanaryMsg: "Udaj się do Sanary-sur-Mer, aby rozpocząć trasę z nawigacją (jesteś obecnie {dist} od punktu startowego).",
     goToSanaryNoGps: "Włącz GPS i udaj się do Sanary-sur-Mer, aby rozpocząć trasę z nawigacją.",
@@ -740,7 +740,7 @@ window.I18N_UI = {
     modeGuidedBadge: "가이드",
     guidedToStart: "점선 경로를 따라 출발지로 이동하세요",
     guidedToStep: "점선 경로를 따라 이동: 코스",
-    followDashedToStart: "점선 경로를 따라 출발 지점으로 이동해 주세요"
+    followDashedToStart: "점선 경로를 따라 출발 지점으로 이동해 주세요",
     goToSanaryTitle: "사나리쉬르메르로 이동하세요",
     goToSanaryMsg: "가이드 투어를 시작하려면 사나리쉬르메르로 이동해 주세요 (현재 출발지에서 {dist} 떨어져 있습니다).",
     goToSanaryNoGps: "가이드 투어를 시작하려면 GPS를 켜고 사나리쉬르메르로 이동해 주세요.",
