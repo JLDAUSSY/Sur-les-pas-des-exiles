@@ -13,7 +13,7 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v31';
+  const AUDIO_VER = 'v32';
   const SANARY_RADIUS_M = 8000; // 8 km autour du départ (Office de Tourisme de Sanary)
   const RETURN_STEP_ID = 99;
 
@@ -62,7 +62,8 @@
     simMode: false,
     wakeLock: null,
     sheetCollapsed: false,
-    guidedModalShown: false
+    guidedModalShown: false,
+    startHintShown: false
   };
 
   let navRouteState = { targetId: null, fromLat: null, fromLon: null, coords: null, dist: null, fetching: false };
@@ -1019,6 +1020,12 @@
     // En mode libre : pas de tracé d'itinéraire ; en mode dirigé (à Sanary) : navigation piétonne réelle
     if (!arrived && state.mode === 'guided' && isUserInSanary()) {
       requestPedestrianNavRoute(target);
+      if (target.id === 1 && !state.startHintShown && el.welcomeScreen.classList.contains('hidden')) {
+        state.startHintShown = true;
+        el.arrivalToastTitle.textContent = `🚶 ${target.titre}`;
+        el.arrivalToastSub.textContent = t('followDashedToStart');
+        el.arrivalToast.classList.remove('hidden');
+      }
     }
   }
 
@@ -1468,6 +1475,7 @@
     if (el.langMenuOverlay) el.langMenuOverlay.classList.add('hidden');
     if (el.guidedLocModal) el.guidedLocModal.classList.add('hidden');
     state.guidedModalShown = false;
+    state.startHintShown = false;
 
     // Réinitialise toujours le parcours au tout début (Étape 1)
     state.currentStepId = 1;
