@@ -20,7 +20,7 @@
 
   <!-- Leaflet 1.9.4 -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=30" />
+  <link rel="stylesheet" href="styles.css?v=31" />
 </head>
 <body>
   <!-- ====================================================================
@@ -56,6 +56,21 @@
       <div class="welcome-section">
         <div id="welcome-choose-lang" class="welcome-section-label">Choisissez votre langue (interface &amp; audio)</div>
         <div id="welcome-lang-grid" class="lang-menu-list" role="listbox" aria-label="Langue"></div>
+      </div>
+
+      <!-- Choix du mode de visite (Parcours libre / Parcours dirigé) -->
+      <div class="welcome-section">
+        <div id="welcome-choose-mode" class="welcome-section-label">Mode de visite</div>
+        <div class="welcome-loop-grid welcome-mode-grid">
+          <button id="welcome-mode-free" class="welcome-loop-card" data-mode="free" type="button">
+            <strong id="welcome-mode-free-title">🧭 Parcours libre</strong>
+            <span id="welcome-mode-free-desc">Dans n’importe quel ordre, sans itinéraire</span>
+          </button>
+          <button id="welcome-mode-guided" class="welcome-loop-card active" data-mode="guided" type="button">
+            <strong id="welcome-mode-guided-title">🚶 Parcours dirigé</strong>
+            <span id="welcome-mode-guided-desc">Du début à la fin • Guidage piéton GPS à Sanary</span>
+          </button>
+        </div>
       </div>
 
       <!-- Choix de la boucle -->
@@ -383,11 +398,27 @@
     <p id="lightbox-caption"></p>
   </div>
 
+  <!-- Modale : Parcours dirigé — Vérification de présence à Sanary-sur-Mer -->
+  <div id="guided-location-modal" class="guided-loc-overlay hidden" role="dialog" aria-modal="true" aria-label="Localisation Sanary-sur-Mer">
+    <div class="guided-loc-card">
+      <div class="guided-loc-icon" aria-hidden="true">📍</div>
+      <h3 id="guided-loc-title" class="guided-loc-title">Allez à Sanary-sur-Mer</h3>
+      <p id="guided-loc-msg" class="guided-loc-msg">
+        Allez à Sanary-sur-Mer pour commencer le parcours dirigé.
+      </p>
+      <div class="guided-loc-actions">
+        <button id="btn-guided-switch-free" class="guided-loc-btn primary" type="button">🧭 Passer en Parcours libre</button>
+        <button id="btn-guided-try-demo" class="guided-loc-btn secondary" type="button">🎬 Tester en mode Démo</button>
+        <button id="btn-guided-retry-gps" class="guided-loc-btn ghost" type="button">↻ Réessayer le GPS</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="data/etapes.js?v=28"></script>
-  <script src="data/i18n.js?v=8"></script>
+  <script src="data/i18n.js?v=31"></script>
   <script src="data/i18n_steps.js?v=26"></script>
-  <script src="app.js?v=30"></script>
+  <script src="app.js?v=31"></script>
 </body>
 </html>
