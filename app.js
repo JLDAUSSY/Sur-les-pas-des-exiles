@@ -13,7 +13,7 @@
   const STORAGE_KEY = 'sanary_exiles_state_v2';
   const ARRIVAL_RADIUS_M = 32;
   const WALK_SPEED_MPS = 1.15;
-  const AUDIO_VER = 'v32';
+  const AUDIO_VER = 'v33';
   const SANARY_RADIUS_M = 8000; // 8 km autour du départ (Office de Tourisme de Sanary)
   const RETURN_STEP_ID = 99;
 
